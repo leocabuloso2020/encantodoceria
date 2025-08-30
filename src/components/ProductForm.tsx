@@ -29,7 +29,11 @@ const productSchema = z.object({
   name: z.string().min(2, { message: "O nome deve ter pelo menos 2 caracteres." }),
   description: z.string().min(10, { message: "A descrição deve ter pelo menos 10 caracteres." }),
   price: z.coerce.number().min(0.01, { message: "O preço deve ser maior que zero." }),
-  image: z.string().url({ message: "A URL da imagem deve ser válida." }).or(z.literal("")), // Permitir string vazia para o caso de não haver imagem
+  // MODIFICADO: Usando z.union para permitir explicitamente string vazia ou URL válida
+  image: z.union([
+    z.literal(""),
+    z.string().url({ message: "A URL da imagem deve ser válida." })
+  ]),
   category: z.enum(["trufa", "doce", "torta"], { message: "Selecione uma categoria válida." }),
   stock: z.coerce.number().int().min(0, { message: "O estoque não pode ser negativo." }),
   featured: z.boolean().default(false),
