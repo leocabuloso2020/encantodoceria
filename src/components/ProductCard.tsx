@@ -3,32 +3,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Product } from "@/types/Product";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast"; // Mantendo o useToast do shadcn/ui para mensagens internas
 
 interface ProductCardProps {
   product: Product;
-  onViewDetails: (product: Product) => void;
+  onViewDetails: (product: Product) => void; // Agora o modal lida com a compra
 }
 
 const ProductCard = ({ product, onViewDetails }: ProductCardProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const { toast } = useToast();
 
-  const handlePixPayment = () => {
-    const pixKey = "31993305095";
-    const amount = product.price.toFixed(2);
-    const description = `Doces da Paty - ${product.name}`;
-    
-    // Criar link PIX oficial do Banco Central
-    const pixUrl = `pix://${pixKey}?amount=${amount}&description=${encodeURIComponent(description)}`;
-    
-    // Tentar abrir o link PIX
-    window.location.href = pixUrl;
-    
-    toast({
-      title: "Redirecionando para pagamento PIX",
-      description: `Valor: R$ ${amount} - Chave PIX: ${pixKey}`,
-    });
+  // A função handlePixPayment agora apenas abre o modal de detalhes,
+  // que por sua vez iniciará o fluxo de compra real.
+  const handlePixPaymentClick = () => {
+    onViewDetails(product);
   };
 
   const toggleFavorite = () => {
@@ -113,7 +102,7 @@ const ProductCard = ({ product, onViewDetails }: ProductCardProps) => {
             </Button>
             
             <Button
-              onClick={handlePixPayment}
+              onClick={handlePixPaymentClick} // Agora chama a função que abre o modal
               disabled={product.stock === 0}
               className="flex-1 pix-button bg-primary hover:bg-primary-hover text-primary-foreground font-semibold py-2 sm:py-3 rounded-lg shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
             >

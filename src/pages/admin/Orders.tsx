@@ -1,9 +1,10 @@
 import { useOrders } from '@/hooks/use-orders';
+import { useUpdateOrderStatus, useDeleteOrder } from '@/hooks/use-order-mutations'; // Importar os novos hooks
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Package, CheckCircle, XCircle, Truck, Clock, MoreHorizontal } from 'lucide-react';
+import { Package, CheckCircle, XCircle, Truck, Clock, MoreHorizontal, Trash2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   DropdownMenu,
@@ -15,9 +16,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { toast } from 'sonner';
 
 const AdminOrders = () => {
   const { data: orders, isLoading, isError, error } = useOrders();
+  const updateOrderStatusMutation = useUpdateOrderStatus();
+  const deleteOrderMutation = useDeleteOrder();
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -32,6 +36,16 @@ const AdminOrders = () => {
       case 'pending':
       default:
         return 'secondary'; // Muted color
+    }
+  };
+
+  const handleUpdateStatus = async (orderId: string, status: 'pending' | 'paid' | 'preparing' | 'delivered' | 'cancelled') => {
+    await updateOrderStatusMutation.mutateAsync({ orderId, status });
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    if (window.confirm("Tem certeza que deseja excluir este pedido? Esta ação é irreversível.")) {
+      await deleteOrderMutation.mutateAsync(orderId);
     }
   };
 
@@ -95,7 +109,7 @@ const AdminOrders = () => {
                 <TableCell>
                   {order.items.map((item, idx) => (
                     <div key={idx} className="text-sm text-muted-foreground">
-                      {item.quantity}x {item.name}
+                      {item.quantity}x {item.name} (R$ {item.price.toFixed(2)})
                     </div>
                   ))}
                 </TableCell>
@@ -126,18 +140,22 @@ const AdminOrders = () => {
                       <DropdownMenuItem onClick={() => console.log('Ver detalhes', order.id)}>
                         Ver detalhes
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => console.log('Marcar como pago', order.id)}>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => handleUpdateStatus(order.id, 'paid')}>
                         Marcar como Pago
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => console.log('Marcar como em preparo', order.id)}>
+                      <DropdownMenuItem onClick={() => handleUpdateStatus(order.id, 'preparing')}>
                         Marcar em Preparo
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => console.log('Marcar como entregue', order.id)}>
+                      <DropdownMenuItem onClick={() => handleUpdateStatus(order.id, 'delivered')}>
                         Marcar como Entregue
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-destructive" onClick={() => console.log('Cancelar pedido', order.id)}>
+                      <DropdownMenuItem className="text-destructive" onClick={() => handleUpdateStatus(order.id, 'cancelled')}>
                         Cancelar Pedido
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteOrder(order.id)}>
+                        <Trash2 className="h-4 w-4 mr-2" /> Excluir Pedido
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
