@@ -1,16 +1,47 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useOrders } from '@/hooks/use-orders'; // Importar o hook de pedidos
+import { useMemo } from 'react';
 
 const AdminFinanceiro = () => {
-  const isLoading = false; // Placeholder for loading state
-  const isError = false; // Placeholder for error state
+  const { data: orders, isLoading, isError, error } = useOrders();
 
-  // Mock data for financial overview
-  const totalRevenue = 12500.75;
-  const monthlySales = 3200.50;
-  const expenses = 1500.00;
-  const profit = monthlySales - expenses;
+  const { totalRevenue, monthlySales, profit } = useMemo(() => {
+    if (!orders) {
+      return { totalRevenue: 0, monthlySales: 0, profit: 0 };
+    }
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    let calculatedTotalRevenue = 0;
+    let calculatedMonthlySales = 0;
+    // Para um cálculo de lucro real, precisaríamos de uma tabela de despesas.
+    // Por enquanto, o lucro será apenas as vendas do mês.
+    let calculatedProfit = 0;
+
+    orders.forEach(order => {
+      calculatedTotalRevenue += order.total_amount;
+
+      const orderDate = new Date(order.created_at);
+      if (orderDate.getMonth() === currentMonth && orderDate.getFullYear() === currentYear) {
+        calculatedMonthlySales += order.total_amount;
+      }
+    });
+
+    // Placeholder para despesas, em um cenário real viria de outra fonte
+    const mockExpenses = 1500.00; // Exemplo de despesa fixa mensal
+    calculatedProfit = calculatedMonthlySales - mockExpenses;
+
+
+    return {
+      totalRevenue: calculatedTotalRevenue,
+      monthlySales: calculatedMonthlySales,
+      profit: calculatedProfit,
+    };
+  }, [orders]);
 
   if (isLoading) {
     return (
@@ -37,7 +68,7 @@ const AdminFinanceiro = () => {
           <CardTitle>Erro</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-destructive">Erro ao carregar dados financeiros.</p>
+          <p className="text-destructive">Erro ao carregar dados financeiros: {error?.message}</p>
         </CardContent>
       </Card>
     );
@@ -55,7 +86,7 @@ const AdminFinanceiro = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">R$ {totalRevenue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">+20.1% do mês passado</p>
+            <p className="text-xs text-muted-foreground">Acumulado de todos os pedidos</p>
           </CardContent>
         </Card>
 
@@ -66,25 +97,24 @@ const AdminFinanceiro = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">R$ {monthlySales.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">+180.1% do mês passado</p>
+            <p className="text-xs text-muted-foreground">Vendas no mês atual</p>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-card to-secondary-soft border-border/50 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Lucro Líquido</CardTitle>
+            <CardTitle className="text-sm font-medium">Lucro Líquido (Estimado)</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className={`text-2xl font-bold ${profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               R$ {profit.toFixed(2)}
             </div>
-            <p className="text-xs text-muted-foreground">Baseado em vendas e despesas</p>
+            <p className="text-xs text-muted-foreground">Vendas do mês - R$1500 (despesas fixas)</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Adicionar mais seções financeiras aqui, como gráficos, tabelas de transações, etc. */}
       <Card className="bg-gradient-to-br from-card to-secondary-soft border-border/50 shadow-lg">
         <CardHeader>
           <CardTitle>Relatório Detalhado</CardTitle>
