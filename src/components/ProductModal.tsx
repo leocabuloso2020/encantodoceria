@@ -180,7 +180,7 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
                   size="lg"
                 >
                   <ShoppingBag className="h-5 w-5 mr-2" />
-                  {createOrderMutation.isPending ? 'Processando...' : (product.stock > 0 ? 'Comprar via PIX' : 'Produto Esgotado')}
+                  {createOrderMutation.isPending ? 'Processando...' : (product.stock > 0 ? 'Comprar' : 'Produto Esgotado')}
                 </Button>
                 
                 <div className="text-center">

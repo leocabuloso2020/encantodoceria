@@ -107,7 +107,7 @@ const ProductCard = ({ product, onViewDetails }: ProductCardProps) => {
               className="flex-1 pix-button bg-primary hover:bg-primary-hover text-primary-foreground font-semibold py-2 sm:py-3 rounded-lg shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
             >
               <ShoppingBag className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-              PIX
+              Comprar
             </Button>
           </div>
         </div>
