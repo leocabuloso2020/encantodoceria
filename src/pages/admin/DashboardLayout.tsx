@@ -1,5 +1,5 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { Home, Package, MessageSquare, LogOut, Heart, DollarSign } from 'lucide-react'; // Importa DollarSign
+import { Home, Package, MessageSquare, LogOut, Heart, DollarSign, ShoppingBag } from 'lucide-react'; // Importa ShoppingBag para Pedidos
 import { Button } from '@/components/ui/button';
 import { useSession } from '@/components/SessionContextProvider';
 import { supabase } from '@/integrations/supabase/client';
@@ -26,6 +26,7 @@ const DashboardLayout = () => {
         <aside className="w-64 bg-sidebar p-6 border-r border-sidebar-border flex flex-col justify-between">
           <div className="space-y-6">
             <Skeleton className="h-8 w-48 mb-8" />
+            <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
@@ -68,6 +69,10 @@ const DashboardLayout = () => {
             <Link to="/admin/products" className="flex items-center space-x-3 p-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-200">
               <Package className="h-5 w-5" />
               <span>Produtos</span>
+            </Link>
+            <Link to="/admin/orders" className="flex items-center space-x-3 p-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-200">
+              <ShoppingBag className="h-5 w-5" />
+              <span>Pedidos</span>
             </Link>
             <Link to="/admin/messages" className="flex items-center space-x-3 p-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-200">
               <MessageSquare className="h-5 w-5" />

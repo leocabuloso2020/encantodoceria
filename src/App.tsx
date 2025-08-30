@@ -9,7 +9,8 @@ import Login from "./pages/Login";
 import DashboardLayout from "./pages/admin/DashboardLayout";
 import AdminProducts from "./pages/admin/Products";
 import AdminMessages from "./pages/admin/Messages";
-import AdminFinanceiro from "./pages/admin/Financeiro"; // Importa o novo componente financeiro
+import AdminFinanceiro from "./pages/admin/Financeiro";
+import AdminOrders from "./pages/admin/Orders"; // Importa o novo componente de pedidos
 import { SessionContextProvider } from "./components/SessionContextProvider";
 
 const queryClient = new QueryClient();
@@ -29,7 +30,8 @@ const App = () => (
               <Route index element={<AdminProducts />} /> {/* Default admin page */}
               <Route path="products" element={<AdminProducts />} />
               <Route path="messages" element={<AdminMessages />} />
-              <Route path="financeiro" element={<AdminFinanceiro />} /> {/* Nova rota para financeiro */}
+              <Route path="financeiro" element={<AdminFinanceiro />} />
+              <Route path="orders" element={<AdminOrders />} /> {/* Nova rota para pedidos */}
               {/* ADD ALL CUSTOM ADMIN ROUTES HERE */}
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
