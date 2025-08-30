@@ -1,5 +1,6 @@
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { pt } from '@supabase/auth-ui-shared/locales/pt'; // Caminho corrigido novamente
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
@@ -61,13 +62,14 @@ const Login = () => {
                   inputBorderFocus: 'hsl(var(--ring))',
                   inputText: 'hsl(var(--foreground))',
                   inputLabelText: 'hsl(var(--muted-foreground))',
-                  anchorTextColor: 'hsl(var(--primary))', // Corrigido
-                  anchorTextHoverColor: 'hsl(var(--primary-hover))', // Corrigido
+                  anchorTextColor: 'hsl(var(--primary))',
+                  anchorTextHoverColor: 'hsl(var(--primary-hover))',
                 },
               },
             },
           }}
           theme="light"
+          localization={pt} // Adiciona a localização em português
           redirectTo={window.location.origin + '/admin'} // Redirect to admin after successful login
         />
       </div>
