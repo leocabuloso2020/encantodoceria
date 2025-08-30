@@ -1,6 +1,6 @@
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
-import { pt } from '@supabase/auth-ui-shared/locales/pt'; // Caminho corrigido novamente
+import { pt } from '@supabase/auth-ui-shared/locales/pt'; // Importa o objeto de localização 'pt'
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
@@ -69,7 +69,7 @@ const Login = () => {
             },
           }}
           theme="light"
-          localization={pt} // Adiciona a localização em português
+          localization={pt} // Usa o objeto de localização 'pt' diretamente
           redirectTo={window.location.origin + '/admin'} // Redirect to admin after successful login
         />
       </div>
