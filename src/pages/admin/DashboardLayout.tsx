@@ -1,5 +1,5 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { Home, Package, MessageSquare, LogOut, Heart } from 'lucide-react';
+import { Home, Package, MessageSquare, LogOut, Heart, DollarSign } from 'lucide-react'; // Importa DollarSign
 import { Button } from '@/components/ui/button';
 import { useSession } from '@/components/SessionContextProvider';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,6 +29,7 @@ const DashboardLayout = () => {
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" /> {/* Adicionado para o novo item */}
           </div>
           <Skeleton className="h-10 w-full" />
         </aside>
@@ -71,6 +72,10 @@ const DashboardLayout = () => {
             <Link to="/admin/messages" className="flex items-center space-x-3 p-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-200">
               <MessageSquare className="h-5 w-5" />
               <span>Mensagens</span>
+            </Link>
+            <Link to="/admin/financeiro" className="flex items-center space-x-3 p-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-200">
+              <DollarSign className="h-5 w-5" />
+              <span>Financeiro</span>
             </Link>
           </nav>
         </div>
