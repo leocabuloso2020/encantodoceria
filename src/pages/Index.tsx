@@ -6,7 +6,6 @@ import HowItWorks from "@/components/HowItWorks";
 import Testimonials from "@/components/Testimonials";
 import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
-import { products } from "@/data/products";
 
 const Index = () => {
   return (
@@ -14,7 +13,7 @@ const Index = () => {
       <Header />
       <main>
         <Hero />
-        <ProductGrid products={products} />
+        <ProductGrid /> {/* Não passamos mais a prop products */}
         <About />
         <HowItWorks />
         <Testimonials />
