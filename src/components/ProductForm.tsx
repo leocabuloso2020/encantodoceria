@@ -22,13 +22,14 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Product } from "@/types/Product";
-import React from "react"; // Adicionado: Importação explícita de React
+import React from "react";
+import ImageUploadField from "./ImageUploadField"; // Importar o novo componente
 
 const productSchema = z.object({
   name: z.string().min(2, { message: "O nome deve ter pelo menos 2 caracteres." }),
   description: z.string().min(10, { message: "A descrição deve ter pelo menos 10 caracteres." }),
   price: z.coerce.number().min(0.01, { message: "O preço deve ser maior que zero." }),
-  image: z.string().url({ message: "A URL da imagem deve ser válida." }),
+  image: z.string().url({ message: "A URL da imagem deve ser válida." }).or(z.literal("")), // Permitir string vazia para o caso de não haver imagem
   category: z.enum(["trufa", "doce", "torta"], { message: "Selecione uma categoria válida." }),
   stock: z.coerce.number().int().min(0, { message: "O estoque não pode ser negativo." }),
   featured: z.boolean().default(false),
@@ -148,9 +149,13 @@ const ProductForm = ({ product, isOpen, onClose, onSubmit }: ProductFormProps) =
               name="image"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>URL da Imagem</FormLabel>
+                  {/* Substituído o Input por ImageUploadField */}
                   <FormControl>
-                    <Input placeholder="https://exemplo.com/imagem.jpg" {...field} />
+                    <ImageUploadField
+                      value={field.value}
+                      onChange={field.onChange}
+                      disabled={form.formState.isSubmitting}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -208,7 +213,7 @@ const ProductForm = ({ product, isOpen, onClose, onSubmit }: ProductFormProps) =
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
               {product ? "Salvar Alterações" : "Adicionar Produto"}
             </Button>
           </form>
