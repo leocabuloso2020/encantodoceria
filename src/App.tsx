@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import DashboardLayout from "./pages/admin/DashboardLayout";
 import AdminProducts from "./pages/admin/Products";
+import AdminMessages from "./pages/admin/Messages"; // Importa o novo componente de mensagens
 import { SessionContextProvider } from "./components/SessionContextProvider";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/admin" element={<DashboardLayout />}>
               <Route index element={<AdminProducts />} /> {/* Default admin page */}
               <Route path="products" element={<AdminProducts />} />
+              <Route path="messages" element={<AdminMessages />} /> {/* Nova rota para mensagens */}
               {/* ADD ALL CUSTOM ADMIN ROUTES HERE */}
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
