@@ -61,8 +61,8 @@ const Login = () => {
                   inputBorderFocus: 'hsl(var(--ring))',
                   inputText: 'hsl(var(--foreground))',
                   inputLabelText: 'hsl(var(--muted-foreground))',
-                  anchorText: 'hsl(var(--primary))',
-                  anchorHoverText: 'hsl(var(--primary-hover))',
+                  anchorTextColor: 'hsl(var(--primary))', // Corrigido
+                  anchorTextHoverColor: 'hsl(var(--primary-hover))', // Corrigido
                 },
               },
             },
