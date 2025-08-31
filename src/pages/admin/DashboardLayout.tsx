@@ -1,5 +1,5 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { Home, Package, MessageSquare, LogOut, Heart, DollarSign, ShoppingBag } from 'lucide-react'; // Importa ShoppingBag para Pedidos
+import { Home, Package, LogOut, Heart, DollarSign, ShoppingBag } from 'lucide-react'; // Removido MessageSquare
 import { Button } from '@/components/ui/button';
 import { useSession } from '@/components/SessionContextProvider';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,7 +30,6 @@ const DashboardLayout = () => {
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" /> {/* Adicionado para o novo item */}
           </div>
           <Skeleton className="h-10 w-full" />
         </aside>
@@ -43,8 +42,6 @@ const DashboardLayout = () => {
   }
 
   if (!isAdmin) {
-    // This case should ideally be handled by SessionContextProvider redirect,
-    // but as a fallback, we can show a message or redirect.
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <p className="text-destructive text-lg">Acesso negado. Você não é um administrador.</p>
@@ -74,10 +71,7 @@ const DashboardLayout = () => {
               <ShoppingBag className="h-5 w-5" />
               <span>Pedidos</span>
             </Link>
-            <Link to="/admin/messages" className="flex items-center space-x-3 p-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-200">
-              <MessageSquare className="h-5 w-5" />
-              <span>Mensagens</span>
-            </Link>
+            {/* Removido o link para Mensagens */}
             <Link to="/admin/financeiro" className="flex items-center space-x-3 p-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-200">
               <DollarSign className="h-5 w-5" />
               <span>Financeiro</span>

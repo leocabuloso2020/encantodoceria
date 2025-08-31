@@ -7,7 +7,7 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import DashboardLayout from "./pages/admin/DashboardLayout";
 import AdminProducts from "./pages/admin/Products";
-import AdminMessages from "./pages/admin/Messages";
+// Removido: import AdminMessages from "./pages/admin/Messages";
 import AdminFinanceiro from "./pages/admin/Financeiro";
 import AdminOrders from "./pages/admin/Orders";
 import { SessionContextProvider } from "./components/SessionContextProvider";
@@ -17,8 +17,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      {/* Removido: <Toaster /> do shadcn/ui */}
-      <Sonner /> {/* Mantido: Sonner para todas as notificações */}
+      <Sonner />
       <BrowserRouter>
         <SessionContextProvider>
           <Routes>
@@ -28,7 +27,7 @@ const App = () => (
             <Route path="/admin" element={<DashboardLayout />}>
               <Route index element={<AdminProducts />} /> {/* Default admin page */}
               <Route path="products" element={<AdminProducts />} />
-              <Route path="messages" element={<AdminMessages />} />
+              {/* Removido: <Route path="messages" element={<AdminMessages />} /> */}
               <Route path="financeiro" element={<AdminFinanceiro />} />
               <Route path="orders" element={<AdminOrders />} />
               {/* ADD ALL CUSTOM ADMIN ROUTES HERE */}
