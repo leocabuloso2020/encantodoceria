@@ -102,7 +102,7 @@ const ProductCard = ({ product, onViewDetails }: ProductCardProps) => {
             </div>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col md:flex-row gap-2"> {/* Alterado de sm:flex-row para md:flex-row */}
             <Button
               variant="outline"
               size="sm"
