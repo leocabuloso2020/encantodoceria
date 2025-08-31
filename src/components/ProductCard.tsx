@@ -102,7 +102,7 @@ const ProductCard = ({ product, onViewDetails }: ProductCardProps) => {
             </div>
           </div>
           
-          <div className="flex flex-col md:flex-row gap-2"> {/* Alterado de sm:flex-row para md:flex-row */}
+          <div className="flex flex-col md:flex-row gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -119,7 +119,7 @@ const ProductCard = ({ product, onViewDetails }: ProductCardProps) => {
               className="flex-1 pix-button bg-primary hover:bg-primary-hover text-primary-foreground font-semibold py-2 sm:py-3 rounded-lg shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
             >
               <ShoppingBag className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-              Adicionar ao Carrinho
+              Comprar
             </Button>
           </div>
         </div>

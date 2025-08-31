@@ -155,7 +155,7 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
                   size="lg"
                 >
                   <ShoppingBag className="h-5 w-5 mr-2" />
-                  {product.stock > 0 ? 'Adicionar ao Carrinho' : 'Produto Esgotado'}
+                  {product.stock > 0 ? 'Comprar' : 'Produto Esgotado'}
                 </Button>
                 
                 <div className="text-center">
