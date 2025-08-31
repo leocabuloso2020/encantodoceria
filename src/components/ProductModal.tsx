@@ -4,9 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { ShoppingBag, Heart, Star, Clock, Truck } from "lucide-react";
 import { Product } from "@/types/Product";
 import { useState } from "react";
-import { toast } from "sonner"; // Usando sonner para todas as notificações
+import { toast } from "sonner";
 import CustomerDetailsDialog from "./CustomerDetailsDialog";
 import { useCreateOrder } from "@/hooks/use-create-order";
+import { useSession } from "@/components/SessionContextProvider"; // Importar useSession
 
 interface ProductModalProps {
   product: Product | null;
@@ -18,21 +19,30 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isCustomerDetailsDialogOpen, setIsCustomerDetailsDialogOpen] = useState(false);
   const createOrderMutation = useCreateOrder();
+  const { user, loading: sessionLoading } = useSession(); // Obter o usuário logado
 
   if (!product) return null;
 
   const handleInitiatePixPayment = () => {
+    if (!user) {
+      toast.error("Você precisa estar logado para fazer um pedido.", {
+        description: "Por favor, faça login ou cadastre-se.",
+      });
+      // Optionally, redirect to login page
+      // navigate('/login');
+      return;
+    }
     setIsCustomerDetailsDialogOpen(true);
   };
 
   const handleConfirmOrderAndPix = async (customerDetails: { customer_name: string; customer_contact: string }) => {
-    if (!product) return;
+    if (!product || !user?.id) return; // Garante que há produto e user.id
 
     const orderItems = [{
       product_id: product.id,
       name: product.name,
       price: product.price,
-      quantity: 1, // Por enquanto, apenas 1 unidade por compra direta
+      quantity: 1,
       image: product.image,
     }];
 
@@ -42,6 +52,7 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
       total_amount: product.price,
       items: orderItems,
       payment_method: 'PIX',
+      user_id: user.id, // Passa o user_id
     };
 
     try {
@@ -78,6 +89,8 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
     doce: "Doce Especial",
     torta: "Torta Gourmet"
   };
+
+  const isBuyButtonDisabled = product.stock === 0 || createOrderMutation.isPending || sessionLoading || !user;
 
   return (
     <>
@@ -172,12 +185,12 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
               <div className="space-y-4 pt-6">
                 <Button
                   onClick={handleInitiatePixPayment}
-                  disabled={product.stock === 0 || createOrderMutation.isPending}
+                  disabled={isBuyButtonDisabled}
                   className="w-full pix-button bg-primary hover:bg-primary-hover text-primary-foreground font-semibold py-4 text-lg rounded-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                   size="lg"
                 >
                   <ShoppingBag className="h-5 w-5 mr-2" />
-                  {createOrderMutation.isPending ? 'Processando...' : (product.stock > 0 ? 'Comprar' : 'Produto Esgotado')}
+                  {sessionLoading ? 'Carregando...' : !user ? 'Faça login para comprar' : (createOrderMutation.isPending ? 'Processando...' : (product.stock > 0 ? 'Comprar' : 'Produto Esgotado'))}
                 </Button>
                 
                 <div className="text-center">

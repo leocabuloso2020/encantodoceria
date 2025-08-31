@@ -15,4 +15,5 @@ export interface Order {
   status: 'pending' | 'paid' | 'preparing' | 'delivered' | 'cancelled';
   items: OrderItem[];
   payment_method: string;
+  user_id?: string; // Adicionado: ID do usuário que fez o pedido
 }

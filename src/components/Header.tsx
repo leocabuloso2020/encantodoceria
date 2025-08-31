@@ -1,8 +1,11 @@
-import { Heart, Menu, X } from "lucide-react";
+import { Heart, Menu, X, ShoppingBag } from "lucide-react"; // Adicionado ShoppingBag
 import { useState } from "react";
+import { Link } from "react-router-dom"; // Importar Link do react-router-dom
+import { useSession } from "@/components/SessionContextProvider"; // Importar useSession
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, loading: sessionLoading } = useSession(); // Obter o usuário logado
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -41,6 +44,17 @@ const Header = () => {
             <a href="#contato" className="text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium">
               Contato
             </a>
+            {!sessionLoading && user && ( // Mostrar "Meus Pedidos" se o usuário estiver logado
+              <Link to="/my-orders" className="text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium flex items-center">
+                <ShoppingBag className="h-4 w-4 mr-1" />
+                Meus Pedidos
+              </Link>
+            )}
+            {!sessionLoading && !user && ( // Mostrar "Login" se o usuário não estiver logado
+              <Link to="/login" className="text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium">
+                Login
+              </Link>
+            )}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -91,6 +105,25 @@ const Header = () => {
               >
                 Contato
               </a>
+              {!sessionLoading && user && (
+                <Link 
+                  to="/my-orders" 
+                  className="text-foreground hover:text-primary transition-colors duration-300 font-medium py-2 flex items-center"
+                  onClick={closeMobileMenu}
+                >
+                  <ShoppingBag className="h-4 w-4 mr-1" />
+                  Meus Pedidos
+                </Link>
+              )}
+              {!sessionLoading && !user && (
+                <Link 
+                  to="/login" 
+                  className="text-foreground hover:text-primary transition-colors duration-300 font-medium py-2"
+                  onClick={closeMobileMenu}
+                >
+                  Login
+                </Link>
+              )}
             </div>
           </nav>
         </div>
