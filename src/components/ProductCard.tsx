@@ -2,28 +2,34 @@ import { ShoppingBag, Heart, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Product } from "@/types/Product";
-import { useState } from "react";
+import { useSession } from "@/components/SessionContextProvider";
+import { useUserFavorites } from "@/hooks/use-user-favorites";
+import { useToggleFavorite } from "@/hooks/use-toggle-favorite";
 import { toast } from "sonner"; // Usando sonner para toasts
 
 interface ProductCardProps {
   product: Product;
-  onViewDetails: (product: Product) => void; // Agora o modal lida com a compra
+  onViewDetails: (product: Product) => void;
 }
 
 const ProductCard = ({ product, onViewDetails }: ProductCardProps) => {
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { user, loading: sessionLoading } = useSession();
+  const { data: favoriteProductIds, isLoading: isLoadingFavorites } = useUserFavorites();
+  const toggleFavoriteMutation = useToggleFavorite();
 
-  // A função handlePixPayment agora apenas abre o modal de detalhes,
-  // que por sua vez iniciará o fluxo de compra real.
+  const isFavorite = favoriteProductIds?.includes(product.id) || false;
+
   const handlePixPaymentClick = () => {
     onViewDetails(product);
   };
 
-  const toggleFavorite = () => {
-    setIsFavorite(!isFavorite);
-    toast(isFavorite ? "Removido dos favoritos" : "Adicionado aos favoritos", {
-      description: product.name,
-    });
+  const handleToggleFavorite = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent opening modal when clicking heart
+    if (!user) {
+      toast.info("Faça login para adicionar produtos aos favoritos.");
+      return;
+    }
+    await toggleFavoriteMutation.mutateAsync({ product_id: product.id, isFavorite });
   };
 
   return (
@@ -49,8 +55,9 @@ const ProductCard = ({ product, onViewDetails }: ProductCardProps) => {
         </button>
         
         <button
-          onClick={toggleFavorite}
-          className="absolute top-3 right-3 p-2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background transition-all duration-300 hover:scale-110"
+          onClick={handleToggleFavorite}
+          disabled={sessionLoading || isLoadingFavorites || toggleFavoriteMutation.isPending}
+          className="absolute top-3 right-3 p-2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Heart 
             className={`h-4 w-4 transition-all duration-300 ${
@@ -100,7 +107,7 @@ const ProductCard = ({ product, onViewDetails }: ProductCardProps) => {
             </Button>
             
             <Button
-              onClick={handlePixPaymentClick} // Agora chama a função que abre o modal
+              onClick={handlePixPaymentClick}
               disabled={product.stock === 0}
               className="flex-1 pix-button bg-primary hover:bg-primary-hover text-primary-foreground font-semibold py-2 sm:py-3 rounded-lg shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
             >

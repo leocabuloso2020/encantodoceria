@@ -7,7 +7,9 @@ import { useState } from "react";
 import { toast } from "sonner";
 import CustomerDetailsDialog from "./CustomerDetailsDialog";
 import { useCreateOrder } from "@/hooks/use-create-order";
-import { useSession } from "@/components/SessionContextProvider"; // Importar useSession
+import { useSession } from "@/components/SessionContextProvider";
+import { useUserFavorites } from "@/hooks/use-user-favorites"; // Importar useUserFavorites
+import { useToggleFavorite } from "@/hooks/use-toggle-favorite"; // Importar useToggleFavorite
 
 interface ProductModalProps {
   product: Product | null;
@@ -16,27 +18,28 @@ interface ProductModalProps {
 }
 
 const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
-  const [isFavorite, setIsFavorite] = useState(false);
   const [isCustomerDetailsDialogOpen, setIsCustomerDetailsDialogOpen] = useState(false);
   const createOrderMutation = useCreateOrder();
-  const { user, loading: sessionLoading } = useSession(); // Obter o usuário logado
+  const { user, loading: sessionLoading } = useSession();
+  const { data: favoriteProductIds, isLoading: isLoadingFavorites } = useUserFavorites(); // Usar o hook de favoritos
+  const toggleFavoriteMutation = useToggleFavorite(); // Usar o hook de toggle
 
   if (!product) return null;
+
+  const isFavorite = favoriteProductIds?.includes(product.id) || false;
 
   const handleInitiatePixPayment = () => {
     if (!user) {
       toast.error("Você precisa estar logado para fazer um pedido.", {
         description: "Por favor, faça login ou cadastre-se.",
       });
-      // Optionally, redirect to login page
-      // navigate('/login');
       return;
     }
     setIsCustomerDetailsDialogOpen(true);
   };
 
   const handleConfirmOrderAndPix = async (customerDetails: { customer_name: string; customer_contact: string }) => {
-    if (!product || !user?.id) return; // Garante que há produto e user.id
+    if (!product || !user?.id) return;
 
     const orderItems = [{
       product_id: product.id,
@@ -52,7 +55,7 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
       total_amount: product.price,
       items: orderItems,
       payment_method: 'PIX',
-      user_id: user.id, // Passa o user_id
+      user_id: user.id,
     };
 
     try {
@@ -72,16 +75,16 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
       setIsCustomerDetailsDialogOpen(false);
       onClose();
     } catch (error) {
-      // Erro já tratado pelo onError do useCreateOrder
       setIsCustomerDetailsDialogOpen(false);
     }
   };
 
-  const toggleFavorite = () => {
-    setIsFavorite(!isFavorite);
-    toast(isFavorite ? "Removido dos favoritos" : "Adicionado aos favoritos", {
-      description: product.name,
-    });
+  const handleToggleFavorite = async () => {
+    if (!user) {
+      toast.info("Faça login para adicionar produtos aos favoritos.");
+      return;
+    }
+    await toggleFavoriteMutation.mutateAsync({ product_id: product.id, isFavorite });
   };
 
   const categoryLabels = {
@@ -91,6 +94,7 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
   };
 
   const isBuyButtonDisabled = product.stock === 0 || createOrderMutation.isPending || sessionLoading || !user;
+  const isFavoriteButtonDisabled = sessionLoading || isLoadingFavorites || toggleFavoriteMutation.isPending;
 
   return (
     <>
@@ -113,8 +117,9 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
               )}
               
               <button
-                onClick={toggleFavorite}
-                className="absolute top-4 right-4 p-3 rounded-full bg-background/90 backdrop-blur-sm hover:bg-background transition-all duration-300 hover:scale-110"
+                onClick={handleToggleFavorite}
+                disabled={isFavoriteButtonDisabled}
+                className="absolute top-4 right-4 p-3 rounded-full bg-background/90 backdrop-blur-sm hover:bg-background transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Heart 
                   className={`h-5 w-5 transition-all duration-300 ${
