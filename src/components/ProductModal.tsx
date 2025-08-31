@@ -8,8 +8,9 @@ import { toast } from "sonner";
 import CustomerDetailsDialog from "./CustomerDetailsDialog";
 import { useCreateOrder } from "@/hooks/use-create-order";
 import { useSession } from "@/components/SessionContextProvider";
-import { useUserFavorites } from "@/hooks/use-user-favorites"; // Importar useUserFavorites
-import { useToggleFavorite } from "@/hooks/use-toggle-favorite"; // Importar useToggleFavorite
+import { useUserFavorites } from "@/hooks/use-user-favorites";
+import { useToggleFavorite } from "@/hooks/use-toggle-favorite";
+import { useCart } from "@/hooks/use-cart"; // Importar useCart
 
 interface ProductModalProps {
   product: Product | null;
@@ -21,62 +22,21 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
   const [isCustomerDetailsDialogOpen, setIsCustomerDetailsDialogOpen] = useState(false);
   const createOrderMutation = useCreateOrder();
   const { user, loading: sessionLoading } = useSession();
-  const { data: favoriteProductIds, isLoading: isLoadingFavorites } = useUserFavorites(); // Usar o hook de favoritos
-  const toggleFavoriteMutation = useToggleFavorite(); // Usar o hook de toggle
+  const { data: favoriteProductIds, isLoading: isLoadingFavorites } = useUserFavorites();
+  const toggleFavoriteMutation = useToggleFavorite();
+  const { addItem } = useCart(); // Usar o hook do carrinho
 
   if (!product) return null;
 
   const isFavorite = favoriteProductIds?.includes(product.id) || false;
 
-  const handleInitiatePixPayment = () => {
-    if (!user) {
-      toast.error("Você precisa estar logado para fazer um pedido.", {
-        description: "Por favor, faça login ou cadastre-se.",
-      });
+  const handleAddToCart = () => {
+    if (product.stock === 0) {
+      toast.error("Produto esgotado!", { description: "Não é possível adicionar este item ao carrinho." });
       return;
     }
-    setIsCustomerDetailsDialogOpen(true);
-  };
-
-  const handleConfirmOrderAndPix = async (customerDetails: { customer_name: string; customer_contact: string }) => {
-    if (!product || !user?.id) return;
-
-    const orderItems = [{
-      product_id: product.id,
-      name: product.name,
-      price: product.price,
-      quantity: 1,
-      image: product.image,
-    }];
-
-    const newOrderPayload = {
-      customer_name: customerDetails.customer_name,
-      customer_contact: customerDetails.customer_contact,
-      total_amount: product.price,
-      items: orderItems,
-      payment_method: 'PIX',
-      user_id: user.id,
-    };
-
-    try {
-      const createdOrder = await createOrderMutation.mutateAsync(newOrderPayload);
-      
-      const pixKey = "31993305095";
-      const amount = product.price.toFixed(2);
-      const description = `Doces da Paty - Pedido ${createdOrder.id.substring(0, 8)} - ${product.name}`;
-      
-      const pixUrl = `pix://${pixKey}?amount=${amount}&description=${encodeURIComponent(description)}`;
-      window.location.href = pixUrl;
-      
-      toast.info("Redirecionando para pagamento PIX", {
-        description: `Valor: R$ ${amount} - Chave PIX: ${pixKey}`,
-      });
-      
-      setIsCustomerDetailsDialogOpen(false);
-      onClose();
-    } catch (error) {
-      setIsCustomerDetailsDialogOpen(false);
-    }
+    addItem(product, 1); // Adiciona 1 unidade do produto ao carrinho
+    onClose(); // Fecha o modal após adicionar ao carrinho
   };
 
   const handleToggleFavorite = async () => {
@@ -93,7 +53,7 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
     torta: "Torta Gourmet"
   };
 
-  const isBuyButtonDisabled = product.stock === 0 || createOrderMutation.isPending || sessionLoading || !user;
+  const isAddToCartButtonDisabled = product.stock === 0;
   const isFavoriteButtonDisabled = sessionLoading || isLoadingFavorites || toggleFavoriteMutation.isPending;
 
   return (
@@ -189,13 +149,13 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
 
               <div className="space-y-4 pt-6">
                 <Button
-                  onClick={handleInitiatePixPayment}
-                  disabled={isBuyButtonDisabled}
+                  onClick={handleAddToCart}
+                  disabled={isAddToCartButtonDisabled}
                   className="w-full pix-button bg-primary hover:bg-primary-hover text-primary-foreground font-semibold py-4 text-lg rounded-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                   size="lg"
                 >
                   <ShoppingBag className="h-5 w-5 mr-2" />
-                  {sessionLoading ? 'Carregando...' : !user ? 'Faça login para comprar' : (createOrderMutation.isPending ? 'Processando...' : (product.stock > 0 ? 'Comprar' : 'Produto Esgotado'))}
+                  {product.stock > 0 ? 'Adicionar ao Carrinho' : 'Produto Esgotado'}
                 </Button>
                 
                 <div className="text-center">
@@ -209,15 +169,7 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
         </DialogContent>
       </Dialog>
 
-      {product && (
-        <CustomerDetailsDialog
-          isOpen={isCustomerDetailsDialogOpen}
-          onClose={() => setIsCustomerDetailsDialogOpen(false)}
-          onConfirm={handleConfirmOrderAndPix}
-          productName={product.name}
-          totalAmount={product.price}
-        />
-      )}
+      {/* Customer Details Dialog is now handled by CartDrawer for multi-item orders */}
     </>
   );
 };

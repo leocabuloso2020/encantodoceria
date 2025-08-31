@@ -5,7 +5,8 @@ import { Product } from "@/types/Product";
 import { useSession } from "@/components/SessionContextProvider";
 import { useUserFavorites } from "@/hooks/use-user-favorites";
 import { useToggleFavorite } from "@/hooks/use-toggle-favorite";
-import { toast } from "sonner"; // Usando sonner para toasts
+import { toast } from "sonner";
+import { useCart } from "@/hooks/use-cart"; // Importar useCart
 
 interface ProductCardProps {
   product: Product;
@@ -16,11 +17,17 @@ const ProductCard = ({ product, onViewDetails }: ProductCardProps) => {
   const { user, loading: sessionLoading } = useSession();
   const { data: favoriteProductIds, isLoading: isLoadingFavorites } = useUserFavorites();
   const toggleFavoriteMutation = useToggleFavorite();
+  const { addItem } = useCart(); // Usar o hook do carrinho
 
   const isFavorite = favoriteProductIds?.includes(product.id) || false;
 
-  const handlePixPaymentClick = () => {
-    onViewDetails(product);
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Evita que o modal seja aberto ao clicar em "Adicionar ao Carrinho"
+    if (product.stock === 0) {
+      toast.error("Produto esgotado!", { description: "Não é possível adicionar este item ao carrinho." });
+      return;
+    }
+    addItem(product, 1); // Adiciona 1 unidade do produto ao carrinho
   };
 
   const handleToggleFavorite = async (e: React.MouseEvent) => {
@@ -107,12 +114,12 @@ const ProductCard = ({ product, onViewDetails }: ProductCardProps) => {
             </Button>
             
             <Button
-              onClick={handlePixPaymentClick}
+              onClick={handleAddToCart}
               disabled={product.stock === 0}
               className="flex-1 pix-button bg-primary hover:bg-primary-hover text-primary-foreground font-semibold py-2 sm:py-3 rounded-lg shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
             >
               <ShoppingBag className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-              Comprar
+              Adicionar ao Carrinho
             </Button>
           </div>
         </div>

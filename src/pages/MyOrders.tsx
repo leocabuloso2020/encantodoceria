@@ -153,8 +153,9 @@ const MyOrders = () => {
                       </TableCell>
                       <TableCell>
                         {order.items.map((item, idx) => (
-                          <div key={idx} className="text-sm text-muted-foreground">
-                            {item.quantity}x {item.name}
+                          <div key={idx} className="flex items-center space-x-2 text-sm text-muted-foreground">
+                            <img src={item.image} alt={item.name} className="w-8 h-8 object-cover rounded-sm" />
+                            <span>{item.quantity}x {item.name}</span>
                           </div>
                         ))}
                       </TableCell>

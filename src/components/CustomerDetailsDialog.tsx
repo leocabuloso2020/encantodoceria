@@ -25,7 +25,7 @@ interface CustomerDetailsDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (values: CustomerDetailsFormValues) => void;
-  productName: string;
+  productName: string; // Agora pode ser um texto genérico como "itens do carrinho"
   totalAmount: number;
 }
 

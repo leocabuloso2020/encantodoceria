@@ -1,11 +1,15 @@
-import { Heart, Menu, X, ShoppingBag } from "lucide-react"; // Adicionado ShoppingBag
+import { Heart, Menu, X, ShoppingBag } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom"; // Importar Link do react-router-dom
-import { useSession } from "@/components/SessionContextProvider"; // Importar useSession
+import { Link } from "react-router-dom";
+import { useSession } from "@/components/SessionContextProvider";
+import { useCart } from "@/hooks/use-cart"; // Importar useCart
+import CartDrawer from "./CartDrawer"; // Importar CartDrawer
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, loading: sessionLoading } = useSession(); // Obter o usuário logado
+  const [isCartOpen, setIsCartOpen] = useState(false); // Estado para o CartDrawer
+  const { user, loading: sessionLoading } = useSession();
+  const { totalItems } = useCart(); // Obter o total de itens do carrinho
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -44,31 +48,59 @@ const Header = () => {
             <a href="#contato" className="text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium">
               Contato
             </a>
-            {!sessionLoading && user && ( // Mostrar "Meus Pedidos" se o usuário estiver logado
+            {!sessionLoading && user && (
               <Link to="/my-orders" className="text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium flex items-center">
                 <ShoppingBag className="h-4 w-4 mr-1" />
                 Meus Pedidos
               </Link>
             )}
-            {!sessionLoading && !user && ( // Mostrar "Login" se o usuário não estiver logado
+            {!sessionLoading && !user && (
               <Link to="/login" className="text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium">
                 Login
               </Link>
             )}
+            {/* Ícone do Carrinho */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative p-2 rounded-lg hover:bg-accent transition-colors duration-300"
+              aria-label="Abrir Carrinho"
+            >
+              <ShoppingBag className="h-6 w-6 text-foreground" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </button>
           </nav>
 
           {/* Mobile Menu Button */}
-          <button
-            onClick={toggleMobileMenu}
-            className="md:hidden p-2 rounded-lg hover:bg-accent transition-colors duration-300"
-            aria-label="Menu"
-          >
-            {isMobileMenuOpen ? (
-              <X className="h-6 w-6 text-foreground" />
-            ) : (
-              <Menu className="h-6 w-6 text-foreground" />
-            )}
-          </button>
+          <div className="flex items-center md:hidden">
+            {/* Ícone do Carrinho para Mobile */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative p-2 rounded-lg hover:bg-accent transition-colors duration-300 mr-2"
+              aria-label="Abrir Carrinho"
+            >
+              <ShoppingBag className="h-6 w-6 text-foreground" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={toggleMobileMenu}
+              className="p-2 rounded-lg hover:bg-accent transition-colors duration-300"
+              aria-label="Menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="h-6 w-6 text-foreground" />
+              ) : (
+                <Menu className="h-6 w-6 text-foreground" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -128,6 +160,9 @@ const Header = () => {
           </nav>
         </div>
       )}
+
+      {/* Cart Drawer */}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </header>
   );
 };

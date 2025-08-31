@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Message } from "@/types/Message";
 import { toast } from "sonner";
 
-interface CreateMessagePayload {
+export interface CreateMessagePayload {
   author_name: string;
   author_email?: string | null;
   message: string;

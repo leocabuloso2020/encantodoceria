@@ -7,9 +7,9 @@ interface CreateOrderPayload {
   customer_name: string;
   customer_contact: string;
   total_amount: number;
-  items: OrderItem[];
+  items: OrderItem[]; // Agora é um array de OrderItem
   payment_method: string;
-  user_id: string; // Agora é obrigatório
+  user_id: string;
 }
 
 export const useCreateOrder = () => {
@@ -29,7 +29,8 @@ export const useCreateOrder = () => {
     },
     onSuccess: (createdOrder) => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
-      queryClient.invalidateQueries({ queryKey: ["customerOrders", createdOrder.user_id] }); // Invalida os pedidos do cliente também
+      queryClient.invalidateQueries({ queryKey: ["customerOrders", createdOrder.user_id] });
+      queryClient.invalidateQueries({ queryKey: ["products"] }); // Invalida produtos para refletir a mudança de estoque
       toast.success(`Pedido #${createdOrder.id.substring(0, 8)}... criado com sucesso!`, {
         description: "Aguardando confirmação de pagamento PIX.",
       });
