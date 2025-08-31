@@ -11,9 +11,10 @@ import AdminProducts from "./pages/admin/Products";
 import AdminFinanceiro from "./pages/admin/Financeiro";
 import AdminOrders from "./pages/admin/Orders";
 import AdminSweetNotes from "./pages/admin/SweetNotes";
-import AdminMessages from "./pages/admin/Messages"; // Importar AdminMessages
+import AdminMessages from "./pages/admin/Messages";
 import MyOrders from "./pages/MyOrders";
 import { SessionContextProvider } from "./components/SessionContextProvider";
+import { CartProvider } from "./context/CartContext"; // Importar CartProvider
 
 const queryClient = new QueryClient();
 
@@ -23,23 +24,25 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <SessionContextProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/my-orders" element={<MyOrders />} />
-            {/* Rotas do Admin */}
-            <Route path="/admin" element={<DashboardLayout />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="products" element={<AdminProducts />} />
-              <Route path="financeiro" element={<AdminFinanceiro />} />
-              <Route path="orders" element={<AdminOrders />} />
-              <Route path="sweet-notes" element={<AdminSweetNotes />} />
-              <Route path="messages" element={<AdminMessages />} /> {/* Nova rota para Mensagens dos Clientes */}
-              {/* ADD ALL CUSTOM ADMIN ROUTES HERE */}
-            </Route>
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <CartProvider> {/* Envolver a aplicação com CartProvider */}
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/my-orders" element={<MyOrders />} />
+              {/* Rotas do Admin */}
+              <Route path="/admin" element={<DashboardLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="products" element={<AdminProducts />} />
+                <Route path="financeiro" element={<AdminFinanceiro />} />
+                <Route path="orders" element={<AdminOrders />} />
+                <Route path="sweet-notes" element={<AdminSweetNotes />} />
+                <Route path="messages" element={<AdminMessages />} />
+                {/* ADD ALL CUSTOM ADMIN ROUTES HERE */}
+              </Route>
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </CartProvider>
         </SessionContextProvider>
       </BrowserRouter>
     </TooltipProvider>
