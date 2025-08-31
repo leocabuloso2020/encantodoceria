@@ -1,5 +1,5 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { Home, Package, LogOut, Heart, DollarSign, ShoppingBag, MessageSquareText } from 'lucide-react'; // Adicionado MessageSquareText
+import { Home, Package, LogOut, Heart, DollarSign, ShoppingBag, MessageSquareText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSession } from '@/components/SessionContextProvider';
 import { supabase } from '@/integrations/supabase/client';
@@ -74,6 +74,10 @@ const DashboardLayout = () => {
             <Link to="/admin/sweet-notes" className="flex items-center space-x-3 p-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-200">
               <MessageSquareText className="h-5 w-5" />
               <span>Bilhetinho Doce</span>
+            </Link>
+            <Link to="/admin/messages" className="flex items-center space-x-3 p-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-200">
+              <MessageSquareText className="h-5 w-5" />
+              <span>Mensagens Clientes</span>
             </Link>
             <Link to="/admin/financeiro" className="flex items-center space-x-3 p-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-200">
               <DollarSign className="h-5 w-5" />

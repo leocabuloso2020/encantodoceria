@@ -10,7 +10,8 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/Products";
 import AdminFinanceiro from "./pages/admin/Financeiro";
 import AdminOrders from "./pages/admin/Orders";
-import AdminSweetNotes from "./pages/admin/SweetNotes"; // Importar AdminSweetNotes
+import AdminSweetNotes from "./pages/admin/SweetNotes";
+import AdminMessages from "./pages/admin/Messages"; // Importar AdminMessages
 import MyOrders from "./pages/MyOrders";
 import { SessionContextProvider } from "./components/SessionContextProvider";
 
@@ -32,7 +33,8 @@ const App = () => (
               <Route path="products" element={<AdminProducts />} />
               <Route path="financeiro" element={<AdminFinanceiro />} />
               <Route path="orders" element={<AdminOrders />} />
-              <Route path="sweet-notes" element={<AdminSweetNotes />} /> {/* Nova rota para Bilhetinho Doce */}
+              <Route path="sweet-notes" element={<AdminSweetNotes />} />
+              <Route path="messages" element={<AdminMessages />} /> {/* Nova rota para Mensagens dos Clientes */}
               {/* ADD ALL CUSTOM ADMIN ROUTES HERE */}
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

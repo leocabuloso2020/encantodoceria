@@ -6,7 +6,8 @@ import HowItWorks from "@/components/HowItWorks";
 import Testimonials from "@/components/Testimonials";
 import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
-import SweetNotePopup from "@/components/SweetNotePopup"; // Importar o novo componente
+import SweetNotePopup from "@/components/SweetNotePopup";
+import SweetMessagesWall from "@/components/SweetMessagesWall"; // Importar o novo componente
 
 const Index = () => {
   return (
@@ -19,9 +20,10 @@ const Index = () => {
         <HowItWorks />
         <Testimonials />
         <FAQ />
+        <SweetMessagesWall /> {/* Adicionar o mural de mensagens aqui */}
       </main>
       <Footer />
-      <SweetNotePopup /> {/* Adicionar o pop-up aqui */}
+      <SweetNotePopup />
     </div>
   );
 };
