@@ -6,6 +6,7 @@ import HowItWorks from "@/components/HowItWorks";
 import Testimonials from "@/components/Testimonials";
 import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
+import SweetNotePopup from "@/components/SweetNotePopup"; // Importar o novo componente
 
 const Index = () => {
   return (
@@ -13,13 +14,14 @@ const Index = () => {
       <Header />
       <main>
         <Hero />
-        <ProductGrid /> {/* Não passamos mais a prop products */}
+        <ProductGrid />
         <About />
         <HowItWorks />
         <Testimonials />
         <FAQ />
       </main>
       <Footer />
+      <SweetNotePopup /> {/* Adicionar o pop-up aqui */}
     </div>
   );
 };

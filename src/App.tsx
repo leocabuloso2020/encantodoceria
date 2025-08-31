@@ -10,7 +10,8 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/Products";
 import AdminFinanceiro from "./pages/admin/Financeiro";
 import AdminOrders from "./pages/admin/Orders";
-import MyOrders from "./pages/MyOrders"; // Importar MyOrders
+import AdminSweetNotes from "./pages/admin/SweetNotes"; // Importar AdminSweetNotes
+import MyOrders from "./pages/MyOrders";
 import { SessionContextProvider } from "./components/SessionContextProvider";
 
 const queryClient = new QueryClient();
@@ -24,13 +25,14 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/my-orders" element={<MyOrders />} /> {/* Nova rota para Meus Pedidos */}
+            <Route path="/my-orders" element={<MyOrders />} />
             {/* Rotas do Admin */}
             <Route path="/admin" element={<DashboardLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="products" element={<AdminProducts />} />
               <Route path="financeiro" element={<AdminFinanceiro />} />
               <Route path="orders" element={<AdminOrders />} />
+              <Route path="sweet-notes" element={<AdminSweetNotes />} /> {/* Nova rota para Bilhetinho Doce */}
               {/* ADD ALL CUSTOM ADMIN ROUTES HERE */}
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
