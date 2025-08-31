@@ -6,8 +6,8 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import DashboardLayout from "./pages/admin/DashboardLayout";
+import AdminDashboard from "./pages/admin/Dashboard"; // Importar o novo Dashboard
 import AdminProducts from "./pages/admin/Products";
-// Removido: import AdminMessages from "./pages/admin/Messages";
 import AdminFinanceiro from "./pages/admin/Financeiro";
 import AdminOrders from "./pages/admin/Orders";
 import { SessionContextProvider } from "./components/SessionContextProvider";
@@ -25,9 +25,8 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             {/* Rotas do Admin */}
             <Route path="/admin" element={<DashboardLayout />}>
-              <Route index element={<AdminProducts />} /> {/* Default admin page */}
+              <Route index element={<AdminDashboard />} /> {/* Agora aponta para o AdminDashboard */}
               <Route path="products" element={<AdminProducts />} />
-              {/* Removido: <Route path="messages" element={<AdminMessages />} /> */}
               <Route path="financeiro" element={<AdminFinanceiro />} />
               <Route path="orders" element={<AdminOrders />} />
               {/* ADD ALL CUSTOM ADMIN ROUTES HERE */}
