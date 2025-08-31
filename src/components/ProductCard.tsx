@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Product } from "@/types/Product";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast"; // Mantendo o useToast do shadcn/ui para mensagens internas
+import { toast } from "sonner"; // Usando sonner para toasts
 
 interface ProductCardProps {
   product: Product;
@@ -12,7 +12,6 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, onViewDetails }: ProductCardProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
-  const { toast } = useToast();
 
   // A função handlePixPayment agora apenas abre o modal de detalhes,
   // que por sua vez iniciará o fluxo de compra real.
@@ -22,8 +21,7 @@ const ProductCard = ({ product, onViewDetails }: ProductCardProps) => {
 
   const toggleFavorite = () => {
     setIsFavorite(!isFavorite);
-    toast({
-      title: isFavorite ? "Removido dos favoritos" : "Adicionado aos favoritos",
+    toast(isFavorite ? "Removido dos favoritos" : "Adicionado aos favoritos", {
       description: product.name,
     });
   };

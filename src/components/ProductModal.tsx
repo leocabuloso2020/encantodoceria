@@ -4,10 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { ShoppingBag, Heart, Star, Clock, Truck } from "lucide-react";
 import { Product } from "@/types/Product";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast"; // Mantendo o useToast do shadcn/ui para mensagens internas
-import { toast as sonnerToast } from "sonner"; // Usando sonner para notificações de sucesso/erro
-import CustomerDetailsDialog from "./CustomerDetailsDialog"; // Importar o novo diálogo
-import { useCreateOrder } from "@/hooks/use-create-order"; // Importar o hook de criação de pedido
+import { toast } from "sonner"; // Usando sonner para todas as notificações
+import CustomerDetailsDialog from "./CustomerDetailsDialog";
+import { useCreateOrder } from "@/hooks/use-create-order";
 
 interface ProductModalProps {
   product: Product | null;
@@ -18,7 +17,6 @@ interface ProductModalProps {
 const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isCustomerDetailsDialogOpen, setIsCustomerDetailsDialogOpen] = useState(false);
-  const { toast } = useToast(); // Para toasts internos do shadcn/ui
   const createOrderMutation = useCreateOrder();
 
   if (!product) return null;
@@ -56,7 +54,7 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
       const pixUrl = `pix://${pixKey}?amount=${amount}&description=${encodeURIComponent(description)}`;
       window.location.href = pixUrl;
       
-      sonnerToast.info("Redirecionando para pagamento PIX", {
+      toast.info("Redirecionando para pagamento PIX", {
         description: `Valor: R$ ${amount} - Chave PIX: ${pixKey}`,
       });
       
@@ -70,8 +68,7 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
 
   const toggleFavorite = () => {
     setIsFavorite(!isFavorite);
-    toast({
-      title: isFavorite ? "Removido dos favoritos" : "Adicionado aos favoritos",
+    toast(isFavorite ? "Removido dos favoritos" : "Adicionado aos favoritos", {
       description: product.name,
     });
   };

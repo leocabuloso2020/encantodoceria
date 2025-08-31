@@ -1,4 +1,3 @@
-import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -10,7 +9,7 @@ import DashboardLayout from "./pages/admin/DashboardLayout";
 import AdminProducts from "./pages/admin/Products";
 import AdminMessages from "./pages/admin/Messages";
 import AdminFinanceiro from "./pages/admin/Financeiro";
-import AdminOrders from "./pages/admin/Orders"; // Importa o novo componente de pedidos
+import AdminOrders from "./pages/admin/Orders";
 import { SessionContextProvider } from "./components/SessionContextProvider";
 
 const queryClient = new QueryClient();
@@ -18,8 +17,8 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
+      {/* Removido: <Toaster /> do shadcn/ui */}
+      <Sonner /> {/* Mantido: Sonner para todas as notificações */}
       <BrowserRouter>
         <SessionContextProvider>
           <Routes>
@@ -31,7 +30,7 @@ const App = () => (
               <Route path="products" element={<AdminProducts />} />
               <Route path="messages" element={<AdminMessages />} />
               <Route path="financeiro" element={<AdminFinanceiro />} />
-              <Route path="orders" element={<AdminOrders />} /> {/* Nova rota para pedidos */}
+              <Route path="orders" element={<AdminOrders />} />
               {/* ADD ALL CUSTOM ADMIN ROUTES HERE */}
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
