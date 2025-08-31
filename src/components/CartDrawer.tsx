@@ -98,7 +98,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
               cartItems.map((item) => (
                 <div key={item.id} className="flex items-center space-x-4 border-b border-border/50 pb-4 last:border-b-0">
                   <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-md" />
-                  <div className="flex-1">
+                  <div className="flex-1 space-y-1"> {/* Adicionado space-y-1 aqui */}
                     <h4 className="font-medium text-foreground">{item.name}</h4>
                     <p className="text-sm text-muted-foreground">R$ {item.price.toFixed(2)} cada</p>
                     <div className="flex items-center space-x-2 mt-1">
