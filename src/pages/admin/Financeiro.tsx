@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
+import { DollarSign, TrendingUp } from 'lucide-react'; // Removido TrendingDown, pois não é mais usado
 import { Skeleton } from '@/components/ui/skeleton';
-import { useOrders } from '@/hooks/use-orders'; // Importar o hook de pedidos
+import { useOrders } from '@/hooks/use-orders';
 import { useMemo } from 'react';
 
 const AdminFinanceiro = () => {
@@ -18,8 +18,6 @@ const AdminFinanceiro = () => {
 
     let calculatedTotalRevenue = 0;
     let calculatedMonthlySales = 0;
-    // Para um cálculo de lucro real, precisaríamos de uma tabela de despesas.
-    // Por enquanto, o lucro será apenas as vendas do mês.
     let calculatedProfit = 0;
 
     orders.forEach(order => {
@@ -31,10 +29,9 @@ const AdminFinanceiro = () => {
       }
     });
 
-    // Placeholder para despesas, em um cenário real viria de outra fonte
-    const mockExpenses = 1500.00; // Exemplo de despesa fixa mensal
-    calculatedProfit = calculatedMonthlySales - mockExpenses;
-
+    // Removido: mockExpenses. O lucro agora reflete apenas as vendas do mês,
+    // pois não há um sistema de despesas real implementado.
+    calculatedProfit = calculatedMonthlySales;
 
     return {
       totalRevenue: calculatedTotalRevenue,
@@ -110,7 +107,7 @@ const AdminFinanceiro = () => {
             <div className={`text-2xl font-bold ${profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               R$ {profit.toFixed(2)}
             </div>
-            <p className="text-xs text-muted-foreground">Vendas do mês - R$1500 (despesas fixas)</p>
+            <p className="text-xs text-muted-foreground">Vendas do mês (sem despesas fixas)</p>
           </CardContent>
         </Card>
       </div>
