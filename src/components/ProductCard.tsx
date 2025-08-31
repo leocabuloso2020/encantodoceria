@@ -22,7 +22,8 @@ const ProductCard = ({ product, onViewDetails }: ProductCardProps) => {
   const isFavorite = favoriteProductIds?.includes(product.id) || false;
 
   const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Evita que o modal seja aberto ao clicar em "Adicionar ao Carrinho"
+    e.stopPropagation(); // Evita que o modal seja aberto ao clicar em "Comprar"
+    console.log('handleAddToCart called for product:', product); // Log de depuração
     if (product.stock === 0) {
       toast.error("Produto esgotado!", { description: "Não é possível adicionar este item ao carrinho." });
       return;

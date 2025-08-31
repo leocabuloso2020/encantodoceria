@@ -31,6 +31,7 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
   const isFavorite = favoriteProductIds?.includes(product.id) || false;
 
   const handleAddToCart = () => {
+    console.log('handleAddToCart called from modal for product:', product); // Log de depuração
     if (product.stock === 0) {
       toast.error("Produto esgotado!", { description: "Não é possível adicionar este item ao carrinho." });
       return;
