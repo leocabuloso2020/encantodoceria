@@ -1,10 +1,10 @@
 import { useOrders } from '@/hooks/use-orders';
-import { useUpdateOrderStatus, useDeleteOrder } from '@/hooks/use-order-mutations'; // Importar os novos hooks
+import { useUpdateOrderStatus, useDeleteOrder } from '@/hooks/use-order-mutations';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Package, CheckCircle, XCircle, Truck, Clock, MoreHorizontal, Trash2 } from 'lucide-react';
+import { Package, CheckCircle, XCircle, Truck, Clock, MoreHorizontal, Trash2, Eye } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   DropdownMenu,
@@ -17,11 +17,16 @@ import {
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { useState } from 'react'; // Importar useState
+import OrderDetailsModal from '@/components/OrderDetailsModal'; // Importar o novo modal
 
 const AdminOrders = () => {
   const { data: orders, isLoading, isError, error } = useOrders();
   const updateOrderStatusMutation = useUpdateOrderStatus();
   const deleteOrderMutation = useDeleteOrder();
+
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -47,6 +52,11 @@ const AdminOrders = () => {
     if (window.confirm("Tem certeza que deseja excluir este pedido? Esta ação é irreversível.")) {
       await deleteOrderMutation.mutateAsync(orderId);
     }
+  };
+
+  const handleViewDetails = (orderId: string) => {
+    setSelectedOrderId(orderId);
+    setIsDetailsModalOpen(true);
   };
 
   if (isLoading) {
@@ -137,8 +147,8 @@ const AdminOrders = () => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                      <DropdownMenuItem onClick={() => console.log('Ver detalhes', order.id)}>
-                        Ver detalhes
+                      <DropdownMenuItem onClick={() => handleViewDetails(order.id)}>
+                        <Eye className="h-4 w-4 mr-2" /> Ver detalhes
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => handleUpdateStatus(order.id, 'paid')}>
@@ -168,6 +178,12 @@ const AdminOrders = () => {
           <p className="text-center text-muted-foreground mt-4">Nenhum pedido encontrado.</p>
         )}
       </CardContent>
+
+      <OrderDetailsModal
+        orderId={selectedOrderId}
+        isOpen={isDetailsModalOpen}
+        onClose={() => setIsDetailsModalOpen(false)}
+      />
     </Card>
   );
 };
