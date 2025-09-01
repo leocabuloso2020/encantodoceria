@@ -10,6 +10,12 @@ export interface UserProfile {
   is_admin: boolean;
 }
 
+// Exportando a interface UpdateProfilePayload
+export interface UpdateProfilePayload {
+  first_name: string | null;
+  last_name: string | null;
+}
+
 export const useUserProfile = () => {
   const { user, loading: sessionLoading } = useSession();
   const userId = user?.id;
@@ -35,11 +41,6 @@ export const useUserProfile = () => {
     staleTime: 1000 * 60 * 5, // Cache por 5 minutos
   });
 };
-
-interface UpdateProfilePayload {
-  first_name: string | null;
-  last_name: string | null;
-}
 
 export const useUpdateUserProfile = () => {
   const queryClient = useQueryClient();

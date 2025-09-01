@@ -11,25 +11,24 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { UserProfile, useUpdateUserProfile } from "@/hooks/use-profile";
+import { UserProfile, useUpdateUserProfile, UpdateProfilePayload } from "@/hooks/use-profile";
 import React from "react";
 import { Loader2 } from "lucide-react";
 
-// O esquema usa `z.string().nullable()` como base,
-// `transform` para converter strings vazias em `null`,
-// e `refine` para validar o comprimento apenas se o valor não for `null`.
-// Isso garante que o tipo inferido seja `string | null` e não opcional.
+// O esquema usa `z.string().transform` para converter strings vazias em `null`,
+// `refine` para validar o comprimento apenas se o valor não for `null`,
+// e uma asserção de tipo (`as z.ZodType<string | null>`) para garantir a inferência correta.
 const profileSchema = z.object({
-  first_name: z.string().nullable() // Base: string | null (não opcional)
-    .transform(val => (typeof val === 'string' && val.trim() === '') ? null : val) // Converte string vazia para null
+  first_name: z.string()
+    .transform(val => val.trim() === '' ? null : val.trim()) // Converte string vazia para null
     .refine(val => val === null || val.length >= 2, { // Valida comprimento se não for null
       message: "O primeiro nome deve ter pelo menos 2 caracteres."
-    }),
-  last_name: z.string().nullable() // Base: string | null (não opcional)
-    .transform(val => (typeof val === 'string' && val.trim() === '') ? null : val) // Converte string vazia para null
+    }) as z.ZodType<string | null>, // Garante que o tipo inferido seja string | null
+  last_name: z.string()
+    .transform(val => val.trim() === '' ? null : val.trim()) // Converte string vazia para null
     .refine(val => val === null || val.length >= 2, { // Valida comprimento se não for null
       message: "O sobrenome deve ter pelo menos 2 caracteres."
-    }),
+    }) as z.ZodType<string | null>, // Garante que o tipo inferido seja string | null
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
