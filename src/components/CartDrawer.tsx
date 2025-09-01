@@ -147,7 +147,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
               disabled={cartItems.length === 0 || createOrderMutation.isPending || sessionLoading || !user}
             >
               <ShoppingBag className="h-5 w-5 mr-2" />
-              {sessionLoading ? 'Carregando...' : !user ? 'Faça login para finalizar' : (createOrderMutation.isPending ? 'Processando...' : 'Finalizar')}
+              {sessionLoading ? 'Carregando...' : !user ? 'Faça login' : (createOrderMutation.isPending ? 'Processando...' : 'Finalizar')}
             </Button>
             <p className="text-xs text-muted-foreground text-center">
               Pagamento seguro via PIX • Chave: 31993305095
