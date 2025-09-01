@@ -15,27 +15,24 @@ import { UserProfile, useUpdateUserProfile, UpdateProfilePayload } from "@/hooks
 import React from "react";
 import { Loader2 } from "lucide-react";
 
-// Define o tipo dos valores do formulário diretamente a partir de UpdateProfilePayload
+// Define o tipo dos valores do formulário a partir da inferência do Zod
+// (UpdateProfilePayload já é o tipo correto que queremos inferir)
 type ProfileFormValues = UpdateProfilePayload;
 
-// O esquema usa `z.preprocess` para converter strings vazias em `null` antes da validação.
-// Em seguida, `z.union` com `z.string().min(2)` e `z.null()` garante que o campo seja `string | null`
-// e não opcional, resolvendo o erro de tipagem com `UpdateProfilePayload`.
-const profileSchema: z.ZodType<ProfileFormValues> = z.object({
-  first_name: z.preprocess(
-    (val) => (typeof val === 'string' && val.trim() === '') ? null : val, // Converte string vazia para null
-    z.union([
-      z.string().min(2, { message: "O primeiro nome deve ter pelo menos 2 caracteres." }),
-      z.null() // Permite explicitamente o valor null
-    ])
-  ),
-  last_name: z.preprocess(
-    (val) => (typeof val === 'string' && val.trim() === '') ? null : val, // Converte string vazia para null
-    z.union([
-      z.string().min(2, { message: "O sobrenome deve ter pelo menos 2 caracteres." }),
-      z.null() // Permite explicitamente o valor null
-    ])
-  ),
+// O esquema usa `z.string().transform` para converter strings vazias em `null`.
+// Em seguida, `z.refine` valida o comprimento apenas se o valor não for `null`.
+// A asserção `as z.ZodType<string | null>` força a inferência de tipo correta para o campo.
+const profileSchema = z.object({
+  first_name: z.string()
+    .transform((val) => val.trim() === '' ? null : val.trim()) // Converte string vazia para null
+    .refine((val) => val === null || val.length >= 2, { // Valida comprimento se não for null
+      message: "O primeiro nome deve ter pelo menos 2 caracteres."
+    }) as z.ZodType<string | null>, // Asserção de tipo para Zod
+  last_name: z.string()
+    .transform((val) => val.trim() === '' ? null : val.trim()) // Converte string vazia para null
+    .refine((val) => val === null || val.length >= 2, { // Valida comprimento se não for null
+      message: "O sobrenome deve ter pelo menos 2 caracteres."
+    }) as z.ZodType<string | null>, // Asserção de tipo para Zod
 });
 
 interface ProfileFormProps {
