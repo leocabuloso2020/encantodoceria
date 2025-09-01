@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import QRCode from 'qrcode.react'; // Importação corrigida para exportação padrão
+import QRCode from 'qrcode.react'; // Corrigido: importação padrão
 import { supabase } from '@/integrations/supabase/client'; // Importar supabase para chamar Edge Function
 
 const OrderConfirmation = () => {
