@@ -1,4 +1,4 @@
-import { Heart, Award, Users, Clock } from "lucide-react";
+import { Heart, Award, Users } from "lucide-react"; // 'Clock' removido
 
 const About = () => {
   return (

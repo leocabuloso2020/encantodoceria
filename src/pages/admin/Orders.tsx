@@ -5,7 +5,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Package, CheckCircle, XCircle, Truck, Clock, MoreHorizontal, Trash2, Eye } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,9 +15,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { toast } from 'sonner';
-import { useState } from 'react'; // Importar useState
-import OrderDetailsModal from '@/components/OrderDetailsModal'; // Importar o novo modal
+import { useState } from 'react';
+import OrderDetailsModal from '@/components/OrderDetailsModal';
+import { Skeleton } from '@/components/ui/skeleton'; // Adicionado: Import do Skeleton
 
 const AdminOrders = () => {
   const { data: orders, isLoading, isError, error } = useOrders();
@@ -31,16 +30,16 @@ const AdminOrders = () => {
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'paid':
-        return 'default'; // Primary color
+        return 'default';
       case 'preparing':
         return 'secondary';
       case 'delivered':
-        return 'outline'; // Greenish
+        return 'outline';
       case 'cancelled':
         return 'destructive';
       case 'pending':
       default:
-        return 'secondary'; // Muted color
+        return 'secondary';
     }
   };
 
@@ -94,7 +93,6 @@ const AdminOrders = () => {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-2xl font-bold">Gerenciar Pedidos</CardTitle>
-        {/* Botão para adicionar novo pedido ou filtrar, se necessário */}
       </CardHeader>
       <CardContent>
         <Table>

@@ -8,7 +8,7 @@ import { CheckCircle, XCircle, MessageSquareText, Trash2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { toast } from 'sonner';
+// import { toast } from 'sonner'; // Removido: não utilizado
 
 const AdminMessages = () => {
   const { data: messages, isLoading, isError, error } = useAdminMessages();

@@ -34,9 +34,9 @@ export const useToggleFavorite = () => {
         if (error) throw new Error(error.message);
       }
     },
-    onSuccess: (_, { product_id, isFavorite }) => {
+    onSuccess: (_, { isFavorite }) => { // 'product_id' removido da desestruturação
       queryClient.invalidateQueries({ queryKey: ["userFavorites", user?.id] });
-      queryClient.invalidateQueries({ queryKey: ["products"] }); // Pode ser útil para re-renderizar cards se houver um indicador de favorito
+      queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success(isFavorite ? "Removido dos favoritos!" : "Adicionado aos favoritos!");
     },
     onError: (error) => {

@@ -2,13 +2,13 @@ import { useProducts } from '@/hooks/use-products';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Edit, Trash2, CheckCircle, XCircle } from 'lucide-react'; // Corrigido: Importando CheckCircle e XCircle
+import { PlusCircle, Edit, Trash2, CheckCircle, XCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Product } from '@/types/Product';
 import { useState } from 'react';
 import ProductForm from '@/components/ProductForm';
 import { useAddProduct, useUpdateProduct, useDeleteProduct } from '@/hooks/use-product-mutations';
-import { toast } from 'sonner'; // Usando sonner para toasts
+// import { toast } from 'sonner'; // Removido: não utilizado
 
 const AdminProducts = () => {
   const { data: products, isLoading, isError, error } = useProducts();
@@ -37,7 +37,6 @@ const AdminProducts = () => {
 
   const handleFormSubmit = async (values: Omit<Product, "id" | "created_at">) => {
     if (editingProduct) {
-      // Ao atualizar, passamos o ID e o created_at do produto existente
       await updateProductMutation.mutateAsync({ ...values, id: editingProduct.id, created_at: editingProduct.created_at });
     } else {
       await addProductMutation.mutateAsync(values);

@@ -22,9 +22,9 @@ import { ptBR } from "date-fns/locale";
 import { CreateMessagePayload } from "@/hooks/use-create-message";
 
 const messageSchema = z.object({
-  author_name: z.string().min(2, { message: "Seu nome deve ter pelo menos 2 caracteres." }).min(1, { message: "O nome não pode ser vazio." }), // Alterado para min(1)
-  author_email: z.string().email({ message: "E-mail inválido." }).nullable().optional(), // Simplificado para nullable().optional()
-  message: z.string().min(10, { message: "A mensagem deve ter pelo menos 10 caracteres." }).max(500, { message: "A mensagem não pode exceder 500 caracteres." }).min(1, { message: "A mensagem não pode ser vazia." }), // Alterado para min(1)
+  author_name: z.string().min(2, { message: "Seu nome deve ter pelo menos 2 caracteres." }).min(1, { message: "O nome não pode ser vazio." }),
+  author_email: z.string().email({ message: "E-mail inválido." }).nullable().optional(),
+  message: z.string().min(10, { message: "A mensagem deve ter pelo menos 10 caracteres." }).max(500, { message: "A mensagem não pode exceder 500 caracteres." }).min(1, { message: "A mensagem não pode ser vazia." }),
 });
 
 type MessageFormValues = z.infer<typeof messageSchema>;
@@ -37,20 +37,19 @@ const SweetMessagesWall = () => {
     resolver: zodResolver(messageSchema),
     defaultValues: {
       author_name: "",
-      author_email: null, // Default para null para corresponder ao schema nullable().optional()
+      author_email: null,
       message: "",
     },
   });
 
   const onSubmit = async (values: MessageFormValues) => {
-    // Construir o payload explicitamente para garantir a tipagem correta
     const payload: CreateMessagePayload = {
       author_name: values.author_name,
       message: values.message,
-      author_email: values.author_email, // Agora pode ser atribuído diretamente
+      author_email: values.author_email,
     };
     await createMessageMutation.mutateAsync(payload);
-    form.reset(); // Limpa o formulário após o envio
+    form.reset();
   };
 
   return (
@@ -70,7 +69,6 @@ const SweetMessagesWall = () => {
         </div>
 
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Formulário para Enviar Mensagem */}
           <Card className="lg:col-span-1 bg-gradient-to-r from-card to-accent-soft border-border/50 shadow-lg p-6 opacity-0 animate-[fadeInUp_0.6s_ease-out_0.2s_forwards]">
             <CardHeader className="pb-4">
               <CardTitle className="text-2xl font-bold text-foreground flex items-center space-x-2">
@@ -101,7 +99,7 @@ const SweetMessagesWall = () => {
                       <FormItem>
                         <FormLabel>Seu E-mail (Opcional)</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="exemplo@email.com" {...field} />
+                          <Input type="email" placeholder="exemplo@email.com" {...field} value={field.value || ""} /> {/* Convertendo null/undefined para "" */}
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -133,7 +131,6 @@ const SweetMessagesWall = () => {
             </CardContent>
           </Card>
 
-          {/* Mural de Mensagens */}
           <div className="lg:col-span-2 space-y-6">
             {isLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
