@@ -19,9 +19,6 @@ import {
 } from "recharts"
 import { cn } from "@/lib/utils"
 
-// Definindo ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent localmente
-// para evitar imports circulares e conflitos de declaração.
-
 export type ChartConfig = {
   [k: string]: {
     label?: string
@@ -56,7 +53,7 @@ const chartable = new Set([
   Bar,
   Line,
   Pie,
-  LineChart, // Adicionado para cobrir todos os tipos de gráfico
+  LineChart,
   BarChart,
   PieChart,
   AreaChart,
@@ -65,10 +62,11 @@ const chartable = new Set([
 type ChartContainerProps = React.ComponentProps<"div"> & {
   config: ChartConfig
   children: React.ReactNode
+  data?: Record<string, any>[]
 }
 
 const ChartContainer = React.forwardRef<HTMLDivElement, ChartContainerProps>(
-  ({ config, className, children, ...props }, ref) => {
+  ({ config, className, children, data, ...props }, ref) => {
     const [activeItemIndex, setActiveItemIndex] = React.useState<
       number | undefined
     >()
@@ -85,7 +83,7 @@ const ChartContainer = React.forwardRef<HTMLDivElement, ChartContainerProps>(
 
     const charts = React.Children.toArray(
       child?.props.children
-    ).filter((child) => React.isValidElement(child) && chartable.has(child.type as any)) // Usando 'as any' para o tipo do componente
+    ).filter((child) => React.isValidElement(child) && chartable.has(child.type as any))
 
     if (!charts.length) {
       return null
@@ -114,7 +112,7 @@ const ChartContainer = React.forwardRef<HTMLDivElement, ChartContainerProps>(
               if (child.type === ResponsiveContainer) {
                 return React.cloneElement(child, {
                   children: React.Children.map(child.props.children, (subChild) => {
-                    if (React.isValidElement(subChild) && chartable.has(subChild.type as any)) { // Usando 'as any'
+                    if (React.isValidElement(subChild) && chartable.has(subChild.type as any)) {
                       return React.cloneElement(subChild, {
                         className: cn("has-[.recharts-tooltip-cursor]:cursor-grab", (subChild.props as any)?.className),
                         onMouseEnter: (...args: unknown[]) => {
@@ -143,7 +141,7 @@ const ChartContainer = React.forwardRef<HTMLDivElement, ChartContainerProps>(
                           setActiveItem(payload?.[index ?? 0])
                           ;(subChild.props as any)?.onClick?.(...args)
                         },
-                        data: (props as any).data, // Acessando data de props do ChartContainer
+                        data: data,
                       })
                     }
                     return subChild
@@ -185,11 +183,16 @@ const ChartTooltip = ({ ...props }: React.ComponentProps<typeof Tooltip>) => {
   )
 }
 
+type ChartTooltipContentProps = React.ComponentProps<"div"> & {
+  active?: boolean
+  payload?: TooltipProps<any, any>["payload"]
+  label?: string
+  itemConfig: ChartConfig
+}
+
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<typeof Tooltip> & {
-    itemConfig: ChartConfig
-  }
+  ChartTooltipContentProps
 >(
   (
     { active, payload, itemConfig, className, ...props },
@@ -198,8 +201,6 @@ const ChartTooltipContent = React.forwardRef<
     if (!active || !payload || payload.length === 0) {
       return null
     }
-
-    const data = payload[0]?.payload
 
     return (
       <div
@@ -239,7 +240,7 @@ const ChartTooltipContent = React.forwardRef<
 )
 ChartTooltipContent.displayName = "ChartTooltipContent"
 
-const Chart = ChartContainer // Exportando Chart como ChartContainer para manter a compatibilidade
+const Chart = ChartContainer
 
 export {
   Chart,
