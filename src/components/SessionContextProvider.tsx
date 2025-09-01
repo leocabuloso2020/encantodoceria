@@ -34,19 +34,23 @@ export const SessionContextProvider = ({ children }: { children: React.ReactNode
           .eq('id', session.user.id)
           .single();
 
-        if (error) {
+        // Se houver um erro, mas não for 'PGRST116' (nenhuma linha encontrada), então é um erro crítico.
+        // Caso contrário, se for 'PGRST116' ou nenhum erro, tratamos como perfil não encontrado ou encontrado.
+        if (error && error.code !== 'PGRST116') {
           console.error('Error fetching profile:', error);
           toast.error('Erro ao carregar perfil do usuário.');
           setIsAdmin(false);
-          await supabase.auth.signOut(); // Sign out if profile cannot be fetched
+          await supabase.auth.signOut(); // Desloga apenas em erros críticos de perfil
           navigate('/login');
         } else {
+          // Se não houve erro ou o erro foi 'PGRST116' (perfil não encontrado),
+          // assume que não é admin por padrão ou usa o valor do perfil.
           setIsAdmin(profile?.is_admin || false);
           if (profile?.is_admin && location.pathname === '/login') {
             navigate('/admin');
           } else if (!profile?.is_admin && location.pathname.startsWith('/admin')) {
             toast.error('Acesso restrito. Você não tem permissões de administrador.');
-            await supabase.auth.signOut(); // Sign out if not admin
+            await supabase.auth.signOut(); // Desloga se tentar acessar admin sem ser admin
             navigate('/login');
           }
         }
@@ -71,7 +75,7 @@ export const SessionContextProvider = ({ children }: { children: React.ReactNode
           .eq('id', session.user.id)
           .single()
           .then(({ data, error }) => {
-            if (error) {
+            if (error && error.code !== 'PGRST116') {
               console.error('Error fetching profile on auth state change:', error);
               toast.error('Erro ao carregar perfil do usuário.');
               setIsAdmin(false);

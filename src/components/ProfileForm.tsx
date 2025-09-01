@@ -15,18 +15,21 @@ import { UserProfile, useUpdateUserProfile } from "@/hooks/use-profile";
 import React from "react";
 import { Loader2 } from "lucide-react";
 
-// O esquema agora usa `z.string().min(X).or(z.literal('')).transform(...)`
-// para garantir que o campo seja `string | null` e não opcional,
-// resolvendo o erro de tipagem com `UpdateProfilePayload`.
+// O esquema usa `z.string().nullable()` como base,
+// `transform` para converter strings vazias em `null`,
+// e `refine` para validar o comprimento apenas se o valor não for `null`.
+// Isso garante que o tipo inferido seja `string | null` e não opcional.
 const profileSchema = z.object({
-  first_name: z.string()
-    .min(2, { message: "O primeiro nome deve ter pelo menos 2 caracteres." })
-    .or(z.literal('')) // Permite string vazia
-    .transform(val => val === '' ? null : val), // Transforma string vazia em null
-  last_name: z.string()
-    .min(2, { message: "O sobrenome deve ter pelo menos 2 caracteres." })
-    .or(z.literal('')) // Permite string vazia
-    .transform(val => val === '' ? null : val), // Transforma string vazia em null
+  first_name: z.string().nullable() // Base: string | null (não opcional)
+    .transform(val => (typeof val === 'string' && val.trim() === '') ? null : val) // Converte string vazia para null
+    .refine(val => val === null || val.length >= 2, { // Valida comprimento se não for null
+      message: "O primeiro nome deve ter pelo menos 2 caracteres."
+    }),
+  last_name: z.string().nullable() // Base: string | null (não opcional)
+    .transform(val => (typeof val === 'string' && val.trim() === '') ? null : val) // Converte string vazia para null
+    .refine(val => val === null || val.length >= 2, { // Valida comprimento se não for null
+      message: "O sobrenome deve ter pelo menos 2 caracteres."
+    }),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
