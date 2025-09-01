@@ -61,20 +61,10 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
     try {
       const createdOrder = await createOrderMutation.mutateAsync(newOrderPayload);
       
-      const pixKey = "31993305095";
-      const amount = totalPrice.toFixed(2);
-      const description = `Doces da Paty - Pedido ${createdOrder.id.substring(0, 8)}`;
-      
-      const pixUrl = `pix://${pixKey}?amount=${amount}&description=${encodeURIComponent(description)}`;
-      window.location.href = pixUrl;
-      
-      toast.info("Redirecionando para pagamento PIX", {
-        description: `Valor: R$ ${amount} - Chave PIX: ${pixKey}`,
-      });
-      
       clearCart();
       setIsCustomerDetailsDialogOpen(false);
       onClose();
+      navigate(`/order-confirmation/${createdOrder.id}`); // Redireciona para a página de confirmação
     } catch (error) {
       setIsCustomerDetailsDialogOpen(false);
     }

@@ -1,15 +1,15 @@
-import { Heart, Menu, X, ShoppingBag } from "lucide-react";
+import { Heart, Menu, X, ShoppingBag, User } from "lucide-react"; // Importar User icon
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSession } from "@/components/SessionContextProvider";
-import { useCart } from "@/hooks/use-cart"; // Importar useCart
-import CartDrawer from "./CartDrawer"; // Importar CartDrawer
+import { useCart } from "@/hooks/use-cart";
+import CartDrawer from "./CartDrawer";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false); // Estado para o CartDrawer
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const { user, loading: sessionLoading } = useSession();
-  const { totalItems } = useCart(); // Obter o total de itens do carrinho
+  const { totalItems } = useCart();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -49,10 +49,16 @@ const Header = () => {
               Contato
             </a>
             {!sessionLoading && user && (
-              <Link to="/my-orders" className="text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium flex items-center">
-                <ShoppingBag className="h-4 w-4 mr-1" />
-                Meus Pedidos
-              </Link>
+              <>
+                <Link to="/my-orders" className="text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium flex items-center">
+                  <ShoppingBag className="h-4 w-4 mr-1" />
+                  Meus Pedidos
+                </Link>
+                <Link to="/profile" className="text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium flex items-center">
+                  <User className="h-4 w-4 mr-1" />
+                  Perfil
+                </Link>
+              </>
             )}
             {!sessionLoading && !user && (
               <Link to="/login" className="text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium">
@@ -138,14 +144,24 @@ const Header = () => {
                 Contato
               </a>
               {!sessionLoading && user && (
-                <Link 
-                  to="/my-orders" 
-                  className="text-foreground hover:text-primary transition-colors duration-300 font-medium py-2 flex items-center"
-                  onClick={closeMobileMenu}
-                >
-                  <ShoppingBag className="h-4 w-4 mr-1" />
-                  Meus Pedidos
-                </Link>
+                <>
+                  <Link 
+                    to="/my-orders" 
+                    className="text-foreground hover:text-primary transition-colors duration-300 font-medium py-2 flex items-center"
+                    onClick={closeMobileMenu}
+                  >
+                    <ShoppingBag className="h-4 w-4 mr-1" />
+                    Meus Pedidos
+                  </Link>
+                  <Link 
+                    to="/profile" 
+                    className="text-foreground hover:text-primary transition-colors duration-300 font-medium py-2 flex items-center"
+                    onClick={closeMobileMenu}
+                  >
+                    <User className="h-4 w-4 mr-1" />
+                    Perfil
+                  </Link>
+                </>
               )}
               {!sessionLoading && !user && (
                 <Link 

@@ -13,8 +13,10 @@ import AdminOrders from "./pages/admin/Orders";
 import AdminSweetNotes from "./pages/admin/SweetNotes";
 import AdminMessages from "./pages/admin/Messages";
 import MyOrders from "./pages/MyOrders";
+import OrderConfirmation from "./pages/OrderConfirmation";
+import Profile from "./pages/Profile"; // Importar a nova página de perfil
 import { SessionContextProvider } from "./components/SessionContextProvider";
-import { CartProvider } from "./context/CartContext"; // Importar CartProvider
+import { CartProvider } from "./context/CartContext";
 
 const queryClient = new QueryClient();
 
@@ -24,11 +26,13 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <SessionContextProvider>
-          <CartProvider> {/* Envolver a aplicação com CartProvider */}
+          <CartProvider>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/my-orders" element={<MyOrders />} />
+              <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+              <Route path="/profile" element={<Profile />} /> {/* Nova rota de perfil */}
               {/* Rotas do Admin */}
               <Route path="/admin" element={<DashboardLayout />}>
                 <Route index element={<AdminDashboard />} />
