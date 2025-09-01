@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { createHmac } from "https://deno.land/std@0.190.0/node/crypto.ts"; // Importar createHmac
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -20,7 +21,47 @@ serve(async (req) => {
       console.log(`${key}: ${value}`);
     }
 
-    const notification = await req.json();
+    const webhookSecret = Deno.env.get('MERCADO_PAGO_WEBHOOK_SECRET');
+    if (!webhookSecret) {
+      console.error("MERCADO_PAGO_WEBHOOK_SECRET not set in environment variables.");
+      return new Response(JSON.stringify({ error: 'Webhook secret not configured' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      });
+    }
+
+    // --- Validação da Assinatura do Mercado Pago ---
+    const xSignature = req.headers.get('x-signature');
+    const xRequestId = req.headers.get('x-request-id');
+    const xWebhookId = req.headers.get('x-webhook-id');
+    const xTimestamp = req.headers.get('x-timestamp');
+
+    if (!xSignature || !xRequestId || !xWebhookId || !xTimestamp) {
+      console.error("Missing Mercado Pago signature headers.");
+      return new Response(JSON.stringify({ error: 'Missing Mercado Pago signature headers' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 401, // Unauthorized
+      });
+    }
+
+    const rawBody = await req.text(); // Ler o corpo da requisição como texto
+    const message = `id:${xWebhookId};uri:/v1/payments;ts:${xTimestamp};data:${rawBody}`;
+
+    const hmac = createHmac('sha256', webhookSecret);
+    hmac.update(message);
+    const expectedSignature = hmac.digest('hex');
+
+    if (expectedSignature !== xSignature) {
+      console.error("Mercado Pago signature verification failed.");
+      return new Response(JSON.stringify({ error: 'Invalid Mercado Pago signature' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 401, // Unauthorized
+      });
+    }
+    // --- Fim da Validação da Assinatura ---
+
+    const notification = JSON.parse(rawBody); // Agora parseamos o corpo que já lemos
+
     console.log("Webhook received:", JSON.stringify(notification, null, 2));
 
     // Processa a notificação de forma assíncrona após responder ao Mercado Pago

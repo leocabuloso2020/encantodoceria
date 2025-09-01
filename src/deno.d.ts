@@ -14,6 +14,11 @@ declare module "https://esm.sh/@supabase/supabase-js@2.45.0" {
   export function createClient(supabaseUrl: string, supabaseKey: string): any;
 }
 
+declare module "https://deno.land/std@0.190.0/node/crypto.ts" {
+  import { Hmac } from "node:crypto"; // Importa o tipo Hmac do módulo 'node:crypto'
+  export function createHmac(algorithm: string, key: string | Buffer): Hmac;
+}
+
 declare namespace Deno {
   namespace env {
     function get(key: string): string | undefined;
