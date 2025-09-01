@@ -14,10 +14,14 @@ declare module "https://esm.sh/@supabase/supabase-js@2.45.0" {
   export function createClient(supabaseUrl: string, supabaseKey: string): any;
 }
 
-// Removido: declare module "https://deno.land/std@0.224.0/node/crypto.ts" {
-//   import { Hmac } from "node:crypto";
-//   export function createHmac(algorithm: string, key: string | Buffer): Hmac;
-// }
+declare module "https://deno.land/std@0.224.0/crypto/mod.ts" {
+  import { Hmac } from "node:crypto"; // Use 'node:crypto' for Hmac type if available in your Node.js environment
+  // Fallback to a simpler type if 'node:crypto' is not suitable for Deno context
+  export function createHmac(algorithm: string, key: string | Uint8Array | string): {
+    update: (data: string | Uint8Array) => void;
+    digest: (encoding: "hex" | "base64" | "binary") => string;
+  };
+}
 
 declare namespace Deno {
   namespace env {
