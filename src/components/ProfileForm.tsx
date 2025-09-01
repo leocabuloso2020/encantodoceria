@@ -15,18 +15,16 @@ import { UserProfile, useUpdateUserProfile } from "@/hooks/use-profile";
 import React from "react";
 import { Loader2 } from "lucide-react";
 
-// O esquema usa `z.preprocess` para converter strings vazias em `null` antes da validação.
+// O esquema usa .transform para converter strings vazias em null e .pipe para aplicar a validação.
 // Isso garante que o tipo final seja `{ first_name: string | null; last_name: string | null; }`,
 // que corresponde a `UpdateProfilePayload` e corrige o erro de TypeScript.
 const profileSchema = z.object({
-  first_name: z.preprocess(
-    (val) => (val === "" ? null : val), // Converte string vazia para null
-    z.string().min(2, { message: "O primeiro nome deve ter pelo menos 2 caracteres." }).nullable() // Valida como string ou null
-  ),
-  last_name: z.preprocess(
-    (val) => (val === "" ? null : val), // Converte string vazia para null
-    z.string().min(2, { message: "O sobrenome deve ter pelo menos 2 caracteres." }).nullable() // Valida como string ou null
-  ),
+  first_name: z.string()
+    .transform(val => val.trim() === '' ? null : val.trim())
+    .pipe(z.string().min(2, { message: "O primeiro nome deve ter pelo menos 2 caracteres." }).nullable()),
+  last_name: z.string()
+    .transform(val => val.trim() === '' ? null : val.trim())
+    .pipe(z.string().min(2, { message: "O sobrenome deve ter pelo menos 2 caracteres." }).nullable()),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -54,6 +52,9 @@ const ProfileForm = ({ profile }: ProfileFormProps) => {
   }, [profile, form]);
 
   const onSubmit = async (values: ProfileFormValues) => {
+    // O objeto 'values' já é transformado pelo resolvedor do esquema Zod
+    // e agora terá as propriedades 'first_name' e 'last_name' como 'string | null',
+    // não opcionais, correspondendo a UpdateProfilePayload.
     await updateProfileMutation.mutateAsync(values);
   };
 
