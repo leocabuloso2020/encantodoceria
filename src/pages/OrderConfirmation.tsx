@@ -5,13 +5,13 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator'; // Corrigido: sintaxe de importação
+import { Separator } from '@/components/ui/separator';
 import { CheckCircle, Copy, DollarSign, CalendarDays, User, Phone, ShoppingBag, QrCode } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { QRCode } from 'qrcode.react'; // Corrigido: importação nomeada
+import QRCode from 'qrcode.react'; // Importação corrigida para exportação padrão
 import { supabase } from '@/integrations/supabase/client'; // Importar supabase para chamar Edge Function
 
 const OrderConfirmation = () => {
