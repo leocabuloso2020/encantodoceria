@@ -1,9 +1,11 @@
-import { Heart, Menu, X, ShoppingBag, User } from "lucide-react";
+import { Heart, Menu, X, ShoppingBag, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSession } from "@/components/SessionContextProvider";
 import { useCart } from "@/hooks/use-cart";
 import CartDrawer from "./CartDrawer";
+import { supabase } from "@/integrations/supabase/client"; // Importar supabase
+import { toast } from "sonner"; // Importar toast
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -32,6 +34,17 @@ const Header = () => {
         element.scrollIntoView({ behavior: 'smooth' });
       }
     }
+  };
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error('Erro ao fazer logout.', { description: error.message });
+    } else {
+      toast.success('Logout realizado com sucesso!');
+      navigate('/login');
+    }
+    closeMobileMenu(); // Fechar menu mobile após logout
   };
 
   return (
@@ -90,6 +103,13 @@ const Header = () => {
                     <User className="h-4 w-4 mr-1" />
                     Perfil
                   </Link>
+                  <button 
+                    onClick={handleLogout} 
+                    className="text-sm lg:text-base text-destructive hover:text-destructive/80 transition-colors duration-300 font-medium flex items-center"
+                  >
+                    <LogOut className="h-4 w-4 mr-1" />
+                    Sair
+                  </button>
                 </>
               )}
               {!sessionLoading && !user && (
@@ -198,6 +218,13 @@ const Header = () => {
                     <User className="h-4 w-4 mr-1" />
                     Perfil
                   </Link>
+                  <button 
+                    onClick={handleLogout} 
+                    className="text-destructive hover:text-destructive/80 transition-colors duration-300 font-medium py-2 flex items-center"
+                  >
+                    <LogOut className="h-4 w-4 mr-1" />
+                    Sair
+                  </button>
                 </>
               )}
               {!sessionLoading && !user && (
