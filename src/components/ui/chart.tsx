@@ -76,20 +76,21 @@ const Chart = React.forwardRef<
     React.useState<RechartsPrimitive.TooltipProps<any, any>["payload"]>()
   const [activeItem, setActiveItem] = React.useState<Record<string, any>>()
 
-  // Garante que apenas um filho seja passado para ResponsiveContainer
-  const clonedChild = React.useMemo(() => {
-    const child = React.Children.only(children); // Espera um único filho
-    if (React.isValidElement(child)) {
-      return React.cloneElement(child, {
-        activeItemIndex,
-        setActiveItemIndex,
-        payload,
-        setPayload,
-        setActiveItem,
-      });
-    }
-    return child; // Retorna o filho original se não for um elemento válido
-  }, [activeItemIndex, children, payload, setActiveItemIndex, setPayload, setActiveItem]);
+  // Permite múltiplos filhos e clona cada um para injetar props
+  const clonedChildren = React.useMemo(
+    () =>
+      React.Children.map(children, (child) => {
+        if (React.isValidElement(child)) {
+          // Recharts components do not directly accept these props.
+          // These props are typically handled by the Chart component itself (e.g., LineChart, BarChart)
+          // and then passed down to its internal elements (e.g., Tooltip, Legend).
+          // Removing them from cloneElement to avoid type errors.
+          return React.cloneElement(child);
+        }
+        return child;
+      }),
+    [children]
+  );
 
   return (
     <ChartContext.Provider
@@ -106,7 +107,7 @@ const Chart = React.forwardRef<
         {...props}
       >
         <RechartsPrimitive.ResponsiveContainer {...props}>
-          {clonedChild} {/* Passa o filho único e clonado */}
+          {clonedChildren} {/* Passa os filhos clonados */}
         </RechartsPrimitive.ResponsiveContainer>
       </div>
     </ChartContext.Provider>

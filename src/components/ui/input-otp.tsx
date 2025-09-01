@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { OTPInput, type OTPInputProps } from "input-otp"
-import { Slot } from "@radix-ui/react-slot" // Importado de @radix-ui/react-slot
+import { Slot } from "@radix-ui/react-slot"
 import { Minus } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -24,7 +24,7 @@ const InputOTP = React.forwardRef<
 InputOTP.displayName = "InputOTP"
 
 const InputOTPGroup = React.forwardRef<
-  React.ElementRef<HTMLDivElement>, // Alterado para HTMLDivElement
+  React.ElementRef<HTMLDivElement>,
   React.ComponentPropsWithoutRef<"div">
 >(({ className, ...props }, ref) => (
   <div ref={ref} className={cn("flex items-center", className)} {...props} />
@@ -32,7 +32,7 @@ const InputOTPGroup = React.forwardRef<
 InputOTPGroup.displayName = "InputOTPGroup"
 
 const InputOTPSlot = React.forwardRef<
-  React.ElementRef<HTMLDivElement>, // Alterado para HTMLDivElement
+  React.ElementRef<HTMLDivElement>,
   React.ComponentPropsWithoutRef<"div"> & { index: number }
 >(({ index, className, ...props }, ref) => (
   <div
@@ -53,11 +53,11 @@ const InputOTPSlot = React.forwardRef<
 InputOTPSlot.displayName = "InputOTPSlot"
 
 const InputOTPSeparator = React.forwardRef<
-  React.ElementRef<HTMLDivElement>, // Ref para um div
+  React.ElementRef<HTMLDivElement>,
   React.ComponentPropsWithoutRef<"div">
 >(({ className, ...props }, ref) => (
   <div ref={ref} role="separator" className={cn("flex items-center", className)} {...props}>
-    <Minus className="h-4 w-4" /> {/* Renderiza o ícone Minus dentro do div */}
+    <Minus className="h-4 w-4" />
   </div>
 ))
 InputOTPSeparator.displayName = "InputOTPSeparator"
