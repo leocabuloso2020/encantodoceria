@@ -170,9 +170,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
               </Button>
             )}
             
-            <p className="text-xs text-muted-foreground text-center">
-              Pagamento seguro via PIX • Chave: 31993305095
-            </p>
+            {/* A mensagem da chave PIX foi removida daqui */}
           </SheetFooter>
         </SheetContent>
       </Sheet>
