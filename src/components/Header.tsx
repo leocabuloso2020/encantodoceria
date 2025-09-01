@@ -1,6 +1,6 @@
 import { Heart, Menu, X, ShoppingBag, User } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom"; // Import useNavigate e useLocation
 import { useSession } from "@/components/SessionContextProvider";
 import { useCart } from "@/hooks/use-cart";
 import CartDrawer from "./CartDrawer";
@@ -10,6 +10,8 @@ const Header = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { user, loading: sessionLoading } = useSession();
   const { totalItems } = useCart();
+  const navigate = useNavigate(); // Inicializa useNavigate
+  const location = useLocation(); // Inicializa useLocation
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -19,12 +21,19 @@ const Header = () => {
     setIsMobileMenuOpen(false);
   };
 
-  // Função para rolar suavemente para a seção
+  // Função modificada para lidar com a rolagem para seções
   const handleScrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      closeMobileMenu(); // Fecha o menu mobile após clicar em um link
+    closeMobileMenu(); // Fecha o menu mobile imediatamente
+
+    if (location.pathname !== '/') {
+      // Se não estiver na página inicial, navega para a home e passa o ID como state
+      navigate('/', { state: { scrollToId: id } });
+    } else {
+      // Se já estiver na página inicial, rola diretamente
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
