@@ -64,7 +64,7 @@ function useChart() {
 
 type ChartProps = {
   config: ChartConfig
-  children: React.ReactNode
+  children: React.ReactNode // Pode ser um único elemento ou um array
 } & React.ComponentPropsWithoutRef<typeof RechartsPrimitive.ResponsiveContainer>
 
 const Chart = React.forwardRef<
@@ -76,31 +76,20 @@ const Chart = React.forwardRef<
     React.useState<RechartsPrimitive.TooltipProps<any, any>["payload"]>()
   const [activeItem, setActiveItem] = React.useState<Record<string, any>>()
 
-  const child = React.useMemo(
-    () =>
-      React.Children.map(children, (child) => {
-        if (React.isValidElement(child)) {
-          // Pass these props to the actual chart component (e.g., LineChart, BarChart)
-          // that is expected to be the direct child of ResponsiveContainer.
-          return React.cloneElement(child, {
-            activeItemIndex,
-            setActiveItemIndex,
-            payload,
-            setPayload,
-            setActiveItem,
-          })
-        }
-        return child
-      }),
-    [
-      activeItemIndex,
-      children,
-      payload,
-      setActiveItemIndex,
-      setPayload,
-      setActiveItem,
-    ]
-  )
+  // Garante que apenas um filho seja passado para ResponsiveContainer
+  const clonedChild = React.useMemo(() => {
+    const child = React.Children.only(children); // Espera um único filho
+    if (React.isValidElement(child)) {
+      return React.cloneElement(child, {
+        activeItemIndex,
+        setActiveItemIndex,
+        payload,
+        setPayload,
+        setActiveItem,
+      });
+    }
+    return child; // Retorna o filho original se não for um elemento válido
+  }, [activeItemIndex, children, payload, setActiveItemIndex, setPayload, setActiveItem]);
 
   return (
     <ChartContext.Provider
@@ -117,7 +106,7 @@ const Chart = React.forwardRef<
         {...props}
       >
         <RechartsPrimitive.ResponsiveContainer {...props}>
-          {child}
+          {clonedChild} {/* Passa o filho único e clonado */}
         </RechartsPrimitive.ResponsiveContainer>
       </div>
     </ChartContext.Provider>
@@ -130,7 +119,7 @@ const ChartTooltip = React.forwardRef<
   React.ComponentPropsWithoutRef<"div"> &
     RechartsPrimitive.TooltipProps<any, any> & {
       hideIndicator?: boolean
-      is?(value: any): boolean // 'is' prop is optional and can be a function
+      is?(value: any): boolean
     }
 >(
   (
@@ -142,7 +131,7 @@ const ChartTooltip = React.forwardRef<
       label,
       formatter,
       hideIndicator,
-      is, // Keep 'is' prop if it's used, otherwise remove
+      is,
       ...props
     },
     ref
@@ -152,10 +141,6 @@ const ChartTooltip = React.forwardRef<
     if (!active || !payload?.length) {
       return null
     }
-
-    // The formatter function expects 5 arguments: (value, name, props, index, payload)
-    // Ensure all 5 are passed if the formatter is provided.
-    // const defaultFormatter = (value: any, name: any, itemProps: any, index: number, payload: any) => value; // Removido pois não é usado diretamente
 
     return (
       <div
@@ -189,7 +174,7 @@ const ChartTooltip = React.forwardRef<
               </div>
               <span className="font-medium">
                 {formatter
-                  ? formatter(item.value, item.name, item, item.index, payload) // Pass all 5 arguments
+                  ? formatter(item.value, item.name, item, item.index, payload)
                   : item.value}
               </span>
             </div>
@@ -205,7 +190,7 @@ const ChartLegend = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<"div"> &
     RechartsPrimitive.LegendProps & {
-      is?(value: any): boolean // 'is' prop is optional and can be a function
+      is?(value: any): boolean
     }
 >(({ className, is, ...props }, ref) => {
   const { config } = useChart()
