@@ -84,12 +84,12 @@ const Chart = React.forwardRef<
           // Recharts components do not directly accept these props.
           // These props are typically handled by the Chart component itself (e.g., LineChart, BarChart)
           // and then passed down to its internal elements (e.g., Tooltip, Legend).
-          // Removing them from cloneElement to avoid type errors.
+          // Removendo-os de cloneElement para evitar erros de tipo.
           return React.cloneElement(child);
         }
         return child;
       }),
-    [children]
+    [children] // Depende apenas de children para re-renderizar
   );
 
   return (
