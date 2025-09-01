@@ -59,7 +59,9 @@ serve(async (req) => {
     const rawBody = await req.text(); // Ler o corpo da requisição como texto
     console.log(`Raw body: ${rawBody}`);
 
-    const message = `id:${xWebhookId};uri:/v1/payments;ts:${xTimestamp};data:${rawBody}`;
+    // CORREÇÃO AQUI: Usar o URI correto do endpoint da função
+    const webhookUri = '/functions/v1/mercadopago-webhook'; 
+    const message = `id:${xWebhookId};uri:${webhookUri};ts:${xTimestamp};data:${rawBody}`;
     console.log(`Message for HMAC: ${message}`);
 
     // Usando Web Crypto API para calcular HMAC
@@ -86,6 +88,8 @@ serve(async (req) => {
 
     if (expectedSignature !== xSignature) {
       console.error("Mercado Pago signature verification failed. Mismatch between calculated and received signature.");
+      console.error(`Expected: ${expectedSignature}`);
+      console.error(`Received: ${xSignature}`);
       return new Response(JSON.stringify({ error: 'Invalid Mercado Pago signature' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 401, // Unauthorized
