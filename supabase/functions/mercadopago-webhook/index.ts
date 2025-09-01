@@ -7,7 +7,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Adicionado para depuração: logar que a função foi invocada
   console.log("mercadopago-webhook function invoked.");
 
   if (req.method === 'OPTIONS') {
@@ -15,6 +14,12 @@ serve(async (req) => {
   }
 
   try {
+    // Log all incoming headers for debugging
+    console.log("Incoming headers:");
+    for (const [key, value] of req.headers.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+
     const notification = await req.json();
     console.log("Webhook received:", JSON.stringify(notification, null, 2));
 
@@ -31,6 +36,8 @@ serve(async (req) => {
           return;
         }
 
+        const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
+
         const paymentResponse = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
           headers: { 'Authorization': `Bearer ${accessToken}` },
         });
@@ -45,7 +52,6 @@ serve(async (req) => {
         const paymentStatus = paymentDetails.status;
 
         if (orderId && paymentStatus === 'approved') {
-          const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
           const { error } = await supabaseAdmin
             .from('orders')
             .update({ status: 'paid' })
@@ -67,7 +73,7 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error processing webhook:', error.message);
-    return new Response(JSON.stringify({ error: 'Webhook processing error' }), {
+    return new Response(JSON.stringify({ error: 'Webhook processing error', details: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
     });
