@@ -142,7 +142,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
             )}
           </div>
           <SheetFooter className="flex flex-col gap-4 mt-6">
-            <div className="flex justify-between items-center text-lg font-semibold text-foreground">
+            <div className="flex justify-between items-center"> {/* Removidas as classes de texto do div pai */}
               <span className="text-base text-muted-foreground">Total:</span>
               <span className="text-xl font-bold text-primary">R$ {totalPrice.toFixed(2)}</span>
             </div>
