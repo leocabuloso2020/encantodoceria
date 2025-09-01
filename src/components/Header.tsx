@@ -1,4 +1,4 @@
-import { Heart, Menu, X, ShoppingBag, User } from "lucide-react"; // Importar User icon
+import { Heart, Menu, X, ShoppingBag, User } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSession } from "@/components/SessionContextProvider";
@@ -53,6 +53,10 @@ const Header = () => {
                 <Link to="/my-orders" className="text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium flex items-center">
                   <ShoppingBag className="h-4 w-4 mr-1" />
                   Meus Pedidos
+                </Link>
+                <Link to="/favorites" className="text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium flex items-center">
+                  <Heart className="h-4 w-4 mr-1" />
+                  Favoritos
                 </Link>
                 <Link to="/profile" className="text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium flex items-center">
                   <User className="h-4 w-4 mr-1" />
@@ -152,6 +156,14 @@ const Header = () => {
                   >
                     <ShoppingBag className="h-4 w-4 mr-1" />
                     Meus Pedidos
+                  </Link>
+                  <Link 
+                    to="/favorites" 
+                    className="text-foreground hover:text-primary transition-colors duration-300 font-medium py-2 flex items-center"
+                    onClick={closeMobileMenu}
+                  >
+                    <Heart className="h-4 w-4 mr-1" />
+                    Favoritos
                   </Link>
                   <Link 
                     to="/profile" 

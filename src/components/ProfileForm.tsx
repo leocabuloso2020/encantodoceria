@@ -16,12 +16,12 @@ import React from "react";
 import { Loader2 } from "lucide-react";
 
 const profileSchema = z.object({
-  first_name: z.string()
-    .transform(e => e === "" ? null : e) // Transforma string vazia em null
-    .pipe(z.string().min(2, { message: "O primeiro nome deve ter pelo menos 2 caracteres." }).nullable()), // Pipe para garantir tipo e validação
-  last_name: z.string()
-    .transform(e => e === "" ? null : e) // Transforma string vazia em null
-    .pipe(z.string().min(2, { message: "O sobrenome deve ter pelo menos 2 caracteres." }).nullable()), // Pipe para garantir tipo e validação
+  first_name: z.string().transform(val => val.trim() === '' ? null : val.trim()).refine(val => val === null || val.length >= 2, {
+    message: "O primeiro nome deve ter pelo menos 2 caracteres."
+  }),
+  last_name: z.string().transform(val => val.trim() === '' ? null : val.trim()).refine(val => val === null || val.length >= 2, {
+    message: "O sobrenome deve ter pelo menos 2 caracteres."
+  }),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -36,20 +36,19 @@ const ProfileForm = ({ profile }: ProfileFormProps) => {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      first_name: profile.first_name || null,
-      last_name: profile.last_name || null,
+      first_name: profile.first_name || "",
+      last_name: profile.last_name || "",
     },
   });
 
   React.useEffect(() => {
     form.reset({
-      first_name: profile.first_name || null,
-      last_name: profile.last_name || null,
+      first_name: profile.first_name || "",
+      last_name: profile.last_name || "",
     });
   }, [profile, form]);
 
   const onSubmit = async (values: ProfileFormValues) => {
-    // Os valores já estão transformados para null se forem strings vazias pelo schema
     await updateProfileMutation.mutateAsync(values);
   };
 

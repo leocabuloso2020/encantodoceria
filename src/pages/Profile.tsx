@@ -6,10 +6,11 @@ import React from "react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { User, Mail } from "lucide-react";
-import { Separator } from "@/components/ui/separator"; // Importação adicionada
+import { User, Mail, Heart } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 import { useUserProfile } from "@/hooks/use-profile";
 import ProfileForm from "@/components/ProfileForm";
+import { Button } from "@/components/ui/button";
 
 const Profile = () => {
   const { user, loading: sessionLoading } = useSession();
@@ -99,7 +100,7 @@ const Profile = () => {
         <Card className="bg-gradient-to-br from-card to-secondary-soft border-border/50 shadow-lg max-w-2xl mx-auto">
           <CardHeader>
             <CardTitle className="text-3xl font-bold text-foreground font-dancing gradient-text">Meu Perfil</CardTitle>
-            <p className="text-muted-foreground">Gerencie suas informações pessoais.</p>
+            <p className="text-muted-foreground">Gerencie suas informações pessoais e favoritos.</p>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-4">
@@ -115,7 +116,14 @@ const Profile = () => {
               )}
             </div>
             <Separator />
-            <h3 className="text-xl font-semibold text-foreground mb-4">Editar Informações</h3>
+            <div className="pt-2">
+              <Button variant="outline" className="w-full" onClick={() => navigate('/favorites')}>
+                <Heart className="h-4 w-4 mr-2" />
+                Ver Meus Favoritos
+              </Button>
+            </div>
+            <Separator />
+            <h3 className="text-xl font-semibold text-foreground pt-2">Editar Informações</h3>
             {profile && <ProfileForm profile={profile} />}
           </CardContent>
         </Card>
