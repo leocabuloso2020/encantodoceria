@@ -15,20 +15,18 @@ import { UserProfile, useUpdateUserProfile } from "@/hooks/use-profile";
 import React from "react";
 import { Loader2 } from "lucide-react";
 
-// O esquema usa `z.string().transform` para converter strings vazias em `null`
-// e `refine` para validar o comprimento apenas se o valor não for `null`.
-// Isso garante que o tipo inferido seja `string | null` e não opcional.
+// O esquema agora usa `z.string().min(X).or(z.literal('')).transform(...)`
+// para garantir que o campo seja `string | null` e não opcional,
+// resolvendo o erro de tipagem com `UpdateProfilePayload`.
 const profileSchema = z.object({
   first_name: z.string()
-    .transform(val => val.trim() === '' ? null : val.trim())
-    .refine(val => val === null || val.length >= 2, {
-      message: "O primeiro nome deve ter pelo menos 2 caracteres."
-    }),
+    .min(2, { message: "O primeiro nome deve ter pelo menos 2 caracteres." })
+    .or(z.literal('')) // Permite string vazia
+    .transform(val => val === '' ? null : val), // Transforma string vazia em null
   last_name: z.string()
-    .transform(val => val.trim() === '' ? null : val.trim())
-    .refine(val => val === null || val.length >= 2, {
-      message: "O sobrenome deve ter pelo menos 2 caracteres."
-    }),
+    .min(2, { message: "O sobrenome deve ter pelo menos 2 caracteres." })
+    .or(z.literal('')) // Permite string vazia
+    .transform(val => val === '' ? null : val), // Transforma string vazia em null
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -56,6 +54,8 @@ const ProfileForm = ({ profile }: ProfileFormProps) => {
   }, [profile, form]);
 
   const onSubmit = async (values: ProfileFormValues) => {
+    // 'values' agora terá 'first_name' e 'last_name' como 'string | null',
+    // correspondendo a UpdateProfilePayload.
     await updateProfileMutation.mutateAsync(values);
   };
 

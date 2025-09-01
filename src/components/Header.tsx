@@ -19,6 +19,15 @@ const Header = () => {
     setIsMobileMenuOpen(false);
   };
 
+  // Função para rolar suavemente para a seção
+  const handleScrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      closeMobileMenu(); // Fecha o menu mobile após clicar em um link
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/50">
       <div className="container mx-auto px-4 py-4">
@@ -36,16 +45,28 @@ const Header = () => {
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-4 lg:space-x-6">
-            <a href="#produtos" className="text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium">
+            <a 
+              onClick={() => handleScrollToSection('produtos')} 
+              className="cursor-pointer text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium"
+            >
               Produtos
             </a>
-            <a href="#sobre" className="text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium">
+            <a 
+              onClick={() => handleScrollToSection('sobre')} 
+              className="cursor-pointer text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium"
+            >
               Sobre
             </a>
-            <a href="#como-funciona" className="text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium">
+            <a 
+              onClick={() => handleScrollToSection('como-funciona')} 
+              className="cursor-pointer text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium"
+            >
               Como Funciona
             </a>
-            <a href="#contato" className="text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium">
+            <a 
+              onClick={() => handleScrollToSection('contato')} 
+              className="cursor-pointer text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium"
+            >
               Contato
             </a>
             {!sessionLoading && user && (
@@ -120,30 +141,26 @@ const Header = () => {
           <nav className="container mx-auto px-4 py-4">
             <div className="flex flex-col space-y-4">
               <a 
-                href="#produtos" 
-                className="text-foreground hover:text-primary transition-colors duration-300 font-medium py-2"
-                onClick={closeMobileMenu}
+                onClick={() => handleScrollToSection('produtos')} 
+                className="cursor-pointer text-foreground hover:text-primary transition-colors duration-300 font-medium py-2"
               >
                 Produtos
               </a>
               <a 
-                href="#sobre" 
-                className="text-foreground hover:text-primary transition-colors duration-300 font-medium py-2"
-                onClick={closeMobileMenu}
+                onClick={() => handleScrollToSection('sobre')} 
+                className="cursor-pointer text-foreground hover:text-primary transition-colors duration-300 font-medium py-2"
               >
                 Sobre
               </a>
               <a 
-                href="#como-funciona" 
-                className="text-foreground hover:text-primary transition-colors duration-300 font-medium py-2"
-                onClick={closeMobileMenu}
+                onClick={() => handleScrollToSection('como-funciona')} 
+                className="cursor-pointer text-foreground hover:text-primary transition-colors duration-300 font-medium py-2"
               >
                 Como Funciona
               </a>
               <a 
-                href="#contato" 
-                className="text-foreground hover:text-primary transition-colors duration-300 font-medium py-2"
-                onClick={closeMobileMenu}
+                onClick={() => handleScrollToSection('contato')} 
+                className="cursor-pointer text-foreground hover:text-primary transition-colors duration-300 font-medium py-2"
               >
                 Contato
               </a>
