@@ -12,7 +12,7 @@ const faqData = [
   },
   {
     question: "Os doces são realmente artesanais?",
-    answer: "Sim! Todos os nossos doces são feitos à mão, com ingredientes premium selecionados. Utilizamos chocolate belga, frutas frescas e seguimos receitas desenvolvidas especialmente pela Paty com muito carinho e dedicação."
+    answer: "Sim! Todos os nossos doces são feitos à mão, com ingredientes premium selecionados. Utilizamos chocolate belga, frutas frescas e seguimos receitas desenvolvidas especialmente com muito carinho e dedicação."
   },
   {
     question: "Vocês fazem encomendas para festas?",

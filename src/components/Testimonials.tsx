@@ -7,7 +7,7 @@ const testimonials = [
     name: "Maria Santos",
     location: "Belo Horizonte",
     rating: 5,
-    comment: "As trufas da Paty são simplesmente divinas! O sabor é incrível e a entrega super rápida. Já virei cliente fiel!",
+    comment: "As trufas da Encanto Doce são simplesmente divinas! O sabor é incrível e a entrega super rápida. Já virei cliente fiel!",
     product: "Trufa de Chocolate Belga"
   },
   {

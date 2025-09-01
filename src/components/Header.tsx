@@ -40,17 +40,16 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/50">
       <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <Heart className="h-8 w-8 text-primary animate-pulse" fill="currentColor" />
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full animate-bounce"></div>
-            </div>
-            <div>
-              <h1 className="font-dancing text-2xl font-bold gradient-text">Doces da Paty</h1>
-              <p className="text-sm text-muted-foreground">Trufas artesanais feitas com amor</p>
-            </div>
+        <div className="flex items-center space-x-3">
+          <div className="relative">
+            <Heart className="h-8 w-8 text-primary animate-pulse" fill="currentColor" />
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full animate-bounce"></div>
           </div>
+          <div>
+            <h1 className="font-dancing text-2xl font-bold gradient-text">Encanto Doce</h1>
+            <p className="text-sm text-muted-foreground">Trufas artesanais feitas com amor</p>
+          </div>
+        </div>
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-4 lg:space-x-6">

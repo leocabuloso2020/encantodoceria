@@ -74,7 +74,7 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary-soft p-4">
       <div className="w-full max-w-md bg-card p-8 rounded-lg shadow-lg border border-border/50">
         <h2 className="text-3xl font-bold text-center text-foreground mb-8 font-dancing gradient-text">
-          Doces da Paty - Login
+          Encanto Doce - Login
         </h2>
         <Auth
           supabaseClient={supabase}
@@ -97,8 +97,8 @@ const Login = () => {
                   anchorTextHoverColor: 'hsl(var(--primary-hover))',
                 },
               },
-            },
-          }}
+            }}
+          }
           theme="light"
           localization={ptLocalization} // Usa o objeto de localização em português definido localmente
           // REMOVIDO: redirectTo={window.location.origin + '/'}

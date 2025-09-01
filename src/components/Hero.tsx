@@ -28,7 +28,7 @@ const Hero = () => {
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="space-y-6 opacity-0 animate-[fadeInUp_0.6s_ease-out_0.2s_forwards] pb-4">
             <h1 className="font-dancing text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent leading-tight py-2">
-              Doces da Paty
+              Encanto Doce
             </h1>
             <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed px-4">
               Trufas artesanais feitas com ingredientes premium e muito carinho. 

@@ -56,7 +56,7 @@ const DashboardLayout = () => {
         <div>
           <div className="flex items-center space-x-2 mb-8">
             <Heart className="h-6 w-6 text-primary" fill="currentColor" />
-            <h2 className="font-dancing text-xl font-bold text-sidebar-foreground">Admin Paty</h2>
+            <h2 className="font-dancing text-xl font-bold text-sidebar-foreground">Admin Encanto</h2>
           </div>
           <nav className="space-y-2">
             <Link to="/admin" className="flex items-center space-x-3 p-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-200">

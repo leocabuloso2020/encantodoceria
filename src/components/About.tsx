@@ -72,7 +72,7 @@ const About = () => {
               </div>
               <div className="text-left">
                 <p className="font-semibold text-foreground">Paola Ribeiro</p>
-                <p className="text-sm text-muted-foreground">Fundadora - Doces da Paty</p>
+                <p className="text-sm text-muted-foreground">Fundadora - Encanto Doce</p>
               </div>
             </div>
           </div>
