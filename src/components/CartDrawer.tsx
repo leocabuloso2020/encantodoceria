@@ -144,13 +144,13 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
           <SheetFooter className="flex flex-col gap-4 mt-6">
             <div className="flex justify-between items-center">
               <span className="text-base text-muted-foreground">Total:</span>
-              <span className="text-lg font-bold text-primary whitespace-nowrap">R$ {totalPrice.toFixed(2)}</span> {/* Adicionado whitespace-nowrap e ajustado para text-lg */}
+              <span className="text-lg font-bold text-primary whitespace-nowrap">R$ {totalPrice.toFixed(2)}</span>
             </div>
 
             {!user ? (
               <Button
                 onClick={handleLoginClick}
-                className="w-full pix-button bg-primary hover:bg-primary-hover text-primary-foreground font-semibold py-2 text-base rounded-lg shadow-lg hover:shadow-xl"
+                className="pix-button bg-primary hover:bg-primary-hover text-primary-foreground font-semibold py-1.5 text-sm rounded-lg shadow-lg hover:shadow-xl mx-auto"
                 disabled={sessionLoading}
               >
                 <ShoppingBag className="h-4 w-4 mr-2" />
