@@ -15,13 +15,18 @@ import { UserProfile, useUpdateUserProfile } from "@/hooks/use-profile";
 import React from "react";
 import { Loader2 } from "lucide-react";
 
+// O esquema usa `z.preprocess` para converter strings vazias em `null` antes da validação.
+// Isso garante que o tipo final seja `{ first_name: string | null; last_name: string | null; }`,
+// que corresponde a `UpdateProfilePayload` e corrige o erro de TypeScript.
 const profileSchema = z.object({
-  first_name: z.string().transform(val => val.trim() === '' ? null : val.trim()).refine(val => val === null || val.length >= 2, {
-    message: "O primeiro nome deve ter pelo menos 2 caracteres."
-  }),
-  last_name: z.string().transform(val => val.trim() === '' ? null : val.trim()).refine(val => val === null || val.length >= 2, {
-    message: "O sobrenome deve ter pelo menos 2 caracteres."
-  }),
+  first_name: z.preprocess(
+    (val) => (val === "" ? null : val), // Converte string vazia para null
+    z.string().min(2, { message: "O primeiro nome deve ter pelo menos 2 caracteres." }).nullable() // Valida como string ou null
+  ),
+  last_name: z.preprocess(
+    (val) => (val === "" ? null : val), // Converte string vazia para null
+    z.string().min(2, { message: "O sobrenome deve ter pelo menos 2 caracteres." }).nullable() // Valida como string ou null
+  ),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
