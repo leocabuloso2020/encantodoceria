@@ -6,18 +6,57 @@ import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Copy, DollarSign, CalendarDays, User, Phone, ShoppingBag } from 'lucide-react';
+import { CheckCircle, Copy, DollarSign, CalendarDays, User, Phone, ShoppingBag, QrCode } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import QRCode from 'qrcode.react'; // Importar qrcode.react
+import { supabase } from '@/integrations/supabase/client'; // Importar supabase para chamar Edge Function
 
 const OrderConfirmation = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
   const { data: order, isLoading, isError, error } = useOrderDetails(orderId || null);
+  const [brCode, setBrCode] = React.useState<string | null>(null);
+  const [isGeneratingQr, setIsGeneratingQr] = React.useState(false);
 
   const pixKey = "31993305095"; // Chave PIX fixa
+  const merchantName = "Encanto Doceria";
+  const merchantCity = "Belo Horizonte"; // Ou a cidade da sua empresa
+
+  React.useEffect(() => {
+    const generateQrCode = async () => {
+      if (order && orderId && !brCode && !isGeneratingQr) {
+        setIsGeneratingQr(true);
+        try {
+          const { data, error } = await supabase.functions.invoke('generate-pix-qr', {
+            body: {
+              pixKey: pixKey,
+              amount: order.total_amount.toFixed(2),
+              transactionId: orderId.substring(0, 25), // Usar parte do ID do pedido como ID da transação
+              merchantName: merchantName,
+              merchantCity: merchantCity,
+            },
+          });
+
+          if (error) {
+            console.error('Error invoking generate-pix-qr function:', error);
+            toast.error("Erro ao gerar QR Code PIX.", { description: error.message });
+          } else if (data && data.brCode) {
+            setBrCode(data.brCode);
+          }
+        } catch (err: any) {
+          console.error('Unexpected error generating QR Code:', err);
+          toast.error("Erro inesperado ao gerar QR Code PIX.", { description: err.message });
+        } finally {
+          setIsGeneratingQr(false);
+        }
+      }
+    };
+
+    generateQrCode();
+  }, [order, orderId, brCode, isGeneratingQr]);
 
   const handleCopyPixKey = () => {
     navigator.clipboard.writeText(pixKey);
@@ -132,23 +171,39 @@ const OrderConfirmation = () => {
 
             <div>
               <h3 className="text-xl font-semibold text-foreground mb-4 text-center">
-                Instruções de Pagamento PIX
+                Pague com PIX
               </h3>
               <p className="text-muted-foreground text-center mb-4">
-                Use a chave PIX abaixo para transferir o valor de <span className="font-bold text-primary">R$ {order.total_amount.toFixed(2)}</span>.
+                Escaneie o QR Code abaixo ou use a chave PIX para transferir o valor de <span className="font-bold text-primary">R$ {order.total_amount.toFixed(2)}</span>.
                 Seu pedido será confirmado automaticamente após o pagamento.
               </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <div className="bg-secondary-soft border border-border/50 rounded-lg p-3 flex items-center justify-between w-full sm:w-auto flex-grow">
-                  <span className="font-mono text-foreground text-lg">{pixKey}</span>
-                  <Button variant="ghost" size="icon" onClick={handleCopyPixKey} className="ml-2">
-                    <Copy className="h-5 w-5 text-muted-foreground hover:text-primary" />
+              
+              <div className="flex flex-col items-center justify-center gap-4 mb-6">
+                {isGeneratingQr ? (
+                  <Skeleton className="h-48 w-48 rounded-lg" />
+                ) : brCode ? (
+                  <div className="p-4 bg-white rounded-lg shadow-md border border-border/50">
+                    <QRCode value={brCode} size={192} level="H" />
+                  </div>
+                ) : (
+                  <div className="text-destructive flex items-center space-x-2">
+                    <QrCode className="h-6 w-6" />
+                    <span>Não foi possível gerar o QR Code.</span>
+                  </div>
+                )}
+                
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-sm">
+                  <div className="bg-secondary-soft border border-border/50 rounded-lg p-3 flex items-center justify-between w-full flex-grow">
+                    <span className="font-mono text-foreground text-lg">{pixKey}</span>
+                    <Button variant="ghost" size="icon" onClick={handleCopyPixKey} className="ml-2">
+                      <Copy className="h-5 w-5 text-muted-foreground hover:text-primary" />
+                    </Button>
+                  </div>
+                  <Button onClick={handleOpenPixApp} className="pix-button w-full sm:w-auto">
+                    <DollarSign className="h-5 w-5 mr-2" />
+                    Abrir App PIX
                   </Button>
                 </div>
-                <Button onClick={handleOpenPixApp} className="pix-button w-full sm:w-auto">
-                  <DollarSign className="h-5 w-5 mr-2" />
-                  Abrir App PIX
-                </Button>
               </div>
             </div>
 
