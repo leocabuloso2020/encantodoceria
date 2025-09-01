@@ -14,7 +14,7 @@ declare module "https://esm.sh/@supabase/supabase-js@2.45.0" {
   export function createClient(supabaseUrl: string, supabaseKey: string): any;
 }
 
-declare module "https://esm.sh/deno_pix@v1.0.0" {
+declare module "https://esm.sh/deno_pix@v1.0.0/mod.ts" { // Caminho corrigido
   // Minimal declaration for the Pix class
   export class Pix {
     constructor();
