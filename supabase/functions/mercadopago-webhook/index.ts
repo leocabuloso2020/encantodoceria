@@ -7,6 +7,9 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Adicionado para depuração: logar que a função foi invocada
+  console.log("mercadopago-webhook function invoked.");
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
