@@ -15,7 +15,7 @@ interface OrderDetailsModalProps {
 }
 
 const OrderDetailsModal = ({ orderId, isOpen, onClose }: OrderDetailsModalProps) => {
-  const { data: order, isLoading, isError, error } = useOrderDetails(orderId || null);
+  const { data: order, isLoading, isError, error } = useOrderDetails(orderId);
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {

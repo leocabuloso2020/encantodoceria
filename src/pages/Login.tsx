@@ -1,9 +1,9 @@
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
-// import { useNavigate } from 'react-router-dom'; // Removido
-// import { useEffect } from 'react'; // Removido
-// import { toast } from 'sonner'; // Removido
+import { useNavigate } from 'react-router-dom'; // Corrigido: Removido '=>'
+import { useEffect } from 'react';
+import { toast } from 'sonner';
 
 // Objeto de localização em português definido diretamente
 const ptLocalization = {
@@ -67,6 +67,9 @@ const ptLocalization = {
 };
 
 const Login = () => {
+  // Removido o useEffect com onAuthStateChange daqui.
+  // A SessionContextProvider agora é responsável por gerenciar o estado de autenticação e redirecionamentos.
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary-soft p-4">
       <div className="w-full max-w-md bg-card p-8 rounded-lg shadow-lg border border-border/50">
@@ -97,7 +100,8 @@ const Login = () => {
             }}
           }
           theme="light"
-          localization={ptLocalization}
+          localization={ptLocalization} // Usa o objeto de localização em português definido localmente
+          // REMOVIDO: redirectTo={window.location.origin + '/'}
         />
       </div>
     </div>

@@ -5,12 +5,12 @@ import { ShoppingBag, Heart, Star, Clock, Truck } from "lucide-react";
 import { Product } from "@/types/Product";
 import { useState } from "react";
 import { toast } from "sonner";
-// import CustomerDetailsDialog from "./CustomerDetailsDialog"; // Removido: não utilizado diretamente aqui
-// import { useCreateOrder } from "@/hooks/use-create-order"; // Removido: não utilizado diretamente aqui
+import CustomerDetailsDialog from "./CustomerDetailsDialog";
+import { useCreateOrder } from "@/hooks/use-create-order";
 import { useSession } from "@/components/SessionContextProvider";
 import { useUserFavorites } from "@/hooks/use-user-favorites";
 import { useToggleFavorite } from "@/hooks/use-toggle-favorite";
-import { useCart } from "@/hooks/use-cart";
+import { useCart } from "@/hooks/use-cart"; // Importar useCart
 
 interface ProductModalProps {
   product: Product | null;
@@ -19,25 +19,25 @@ interface ProductModalProps {
 }
 
 const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
-  // const [isCustomerDetailsDialogOpen, setIsCustomerDetailsDialogOpen] = useState(false); // Removido: não utilizado
-  // const createOrderMutation = useCreateOrder(); // Removido: não utilizado
+  const [isCustomerDetailsDialogOpen, setIsCustomerDetailsDialogOpen] = useState(false);
+  const createOrderMutation = useCreateOrder();
   const { user, loading: sessionLoading } = useSession();
   const { data: favoriteProductIds, isLoading: isLoadingFavorites } = useUserFavorites();
   const toggleFavoriteMutation = useToggleFavorite();
-  const { addItem } = useCart();
+  const { addItem } = useCart(); // Usar o hook do carrinho
 
   if (!product) return null;
 
   const isFavorite = favoriteProductIds?.includes(product.id) || false;
 
   const handleAddToCart = () => {
-    console.log('handleAddToCart called from modal for product:', product);
+    console.log('handleAddToCart called from modal for product:', product); // Log de depuração
     if (product.stock === 0) {
       toast.error("Produto esgotado!", { description: "Não é possível adicionar este item ao carrinho." });
       return;
     }
-    addItem(product, 1);
-    onClose();
+    addItem(product, 1); // Adiciona 1 unidade do produto ao carrinho
+    onClose(); // Fecha o modal após adicionar ao carrinho
   };
 
   const handleToggleFavorite = async () => {

@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query"; // 'useQueryClient' removido
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Message } from "@/types/Message";
 import { toast } from "sonner";
@@ -10,7 +10,7 @@ export interface CreateMessagePayload {
 }
 
 export const useCreateMessage = () => {
-  // const queryClient = useQueryClient(); // Removido: não utilizado
+  const queryClient = useQueryClient();
   return useMutation<Message, Error, CreateMessagePayload>({
     mutationFn: async (newMessageData) => {
       const { data, error } = await supabase

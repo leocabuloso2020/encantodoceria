@@ -4,12 +4,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { UploadCloud, XCircle } from 'lucide-react'; // 'ImageIcon' removido
+import { Image as ImageIcon, UploadCloud, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { Progress } from '@/components/ui/progress';
+import { Progress } from '@/components/ui/progress'; // Importar Progress
 
 interface ImageUploadFieldProps {
-  value?: string;
+  value?: string; // Current image URL
   onChange: (url: string) => void;
   disabled?: boolean;
 }
@@ -37,11 +37,15 @@ const ImageUploadField = ({ value, onChange, disabled }: ImageUploadFieldProps) 
     setUploading(true);
     setUploadProgress(0);
 
-    const { error } = await supabase.storage // 'data' removido, pois não é utilizado
+    const { data, error } = await supabase.storage
       .from('product-images')
       .upload(filePath, file, {
         cacheControl: '3600',
         upsert: false,
+        // Adicionar onUploadProgress para monitorar o progresso
+        // Note: onUploadProgress is not directly supported by supabase-js upload method.
+        // For real-time progress, you might need a custom upload solution or a different library.
+        // For simplicity, we'll simulate progress or update once complete.
       });
 
     if (error) {
@@ -51,6 +55,7 @@ const ImageUploadField = ({ value, onChange, disabled }: ImageUploadFieldProps) 
       return;
     }
 
+    // Get public URL
     const { data: publicUrlData } = supabase.storage
       .from('product-images')
       .getPublicUrl(filePath);
@@ -63,7 +68,7 @@ const ImageUploadField = ({ value, onChange, disabled }: ImageUploadFieldProps) 
       toast.error("Erro ao obter URL pública da imagem.");
     }
     setUploading(false);
-    setUploadProgress(100);
+    setUploadProgress(100); // Set to 100% on completion
   }, [onChange]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -109,7 +114,7 @@ const ImageUploadField = ({ value, onChange, disabled }: ImageUploadFieldProps) 
               size="icon"
               className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
               onClick={(e) => {
-                e.stopPropagation();
+                e.stopPropagation(); // Prevent dropzone from re-opening
                 handleRemoveImage();
               }}
               disabled={disabled}

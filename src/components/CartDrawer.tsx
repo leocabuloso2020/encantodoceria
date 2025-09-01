@@ -1,7 +1,7 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingBag, Trash2, MinusCircle, PlusCircle } from "lucide-react"; // 'XCircle' removido
+import { ShoppingBag, Trash2, MinusCircle, PlusCircle, XCircle } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useState } from "react";
 import CustomerDetailsDialog from "./CustomerDetailsDialog";

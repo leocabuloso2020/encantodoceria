@@ -15,7 +15,7 @@ import AdminMessages from "./pages/admin/Messages";
 import MyOrders from "./pages/MyOrders";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import Profile from "./pages/Profile";
-import Favorites from "./pages/Favorites";
+import Favorites from "./pages/Favorites"; // Importar a nova página
 import { SessionContextProvider } from "./components/SessionContextProvider";
 import { CartProvider } from "./context/CartContext";
 
@@ -24,6 +24,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <Sonner />
       <BrowserRouter>
         <SessionContextProvider>
           <CartProvider>
@@ -33,7 +34,7 @@ const App = () => (
               <Route path="/my-orders" element={<MyOrders />} />
               <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/favorites" element={<Favorites />} />
+              <Route path="/favorites" element={<Favorites />} /> {/* Nova rota de favoritos */}
               {/* Rotas do Admin */}
               <Route path="/admin" element={<DashboardLayout />}>
                 <Route index element={<AdminDashboard />} />
@@ -51,7 +52,6 @@ const App = () => (
         </SessionContextProvider>
       </BrowserRouter>
     </TooltipProvider>
-    <Sonner /> {/* Movido para fora do TooltipProvider */}
   </QueryClientProvider>
 );
 

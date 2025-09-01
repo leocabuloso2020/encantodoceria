@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Heart, X } from "lucide-react";
 import { useSweetNote } from "@/hooks/use-sweet-note";
-// import { Skeleton } from "@/components/ui/skeleton"; // Removido: não utilizado
+import { Skeleton } from "@/components/ui/skeleton";
 
 const LOCAL_STORAGE_KEY = "sweet-note-dismissed-date";
 
@@ -28,11 +28,11 @@ const SweetNotePopup = () => {
   };
 
   if (isLoading) {
-    return null;
+    return null; // Ou um skeleton de carregamento se preferir
   }
 
   if (isError || !sweetNote || !sweetNote.is_active) {
-    return null;
+    return null; // Não exibe se houver erro ou não estiver ativo
   }
 
   return (

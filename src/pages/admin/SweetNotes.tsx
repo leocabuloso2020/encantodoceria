@@ -52,7 +52,7 @@ const AdminSweetNotes = () => {
 
   const onSubmit = async (values: SweetNoteFormValues) => {
     await upsertSweetNoteMutation.mutateAsync({
-      id: sweetNote?.id,
+      id: sweetNote?.id, // Passa o ID se estiver editando
       title: values.title,
       content: values.content,
       is_active: values.is_active,
@@ -106,7 +106,7 @@ const AdminSweetNotes = () => {
                 <FormItem>
                   <FormLabel>Título (Interno para Admin)</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: Mensagem de Boas-Vindas" {...field} value={field.value || ""} /> {/* Convertendo null/undefined para "" */}
+                    <Input placeholder="Ex: Mensagem de Boas-Vindas" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -15,19 +15,24 @@ import { UserProfile, useUpdateUserProfile, UpdateProfilePayload } from "@/hooks
 import React from "react";
 import { Loader2 } from "lucide-react";
 
+// Define o tipo dos valores do formulário a partir da inferência do Zod
+// (UpdateProfilePayload já é o tipo correto que queremos inferir)
 type ProfileFormValues = UpdateProfilePayload;
 
+// O esquema usa `z.string().transform` para converter strings vazias em `null`.
+// Em seguida, `z.refine` valida o comprimento apenas se o valor não for `null`.
+// A asserção `as z.ZodType<string | null>` força a inferência de tipo correta para o campo.
 const profileSchema = z.object({
   first_name: z.string()
-    .transform((val) => val.trim() === '' ? null : val.trim())
-    .refine((val) => val === null || val.length >= 2, {
+    .transform((val) => val.trim() === '' ? null : val.trim()) // Converte string vazia para null
+    .refine((val) => val === null || val.length >= 2, { // Valida comprimento se não for null
       message: "O primeiro nome deve ter pelo menos 2 caracteres."
-    }) as z.ZodType<string | null>,
+    }) as z.ZodType<string | null>, // Asserção de tipo para Zod
   last_name: z.string()
-    .transform((val) => val.trim() === '' ? null : val.trim())
-    .refine((val) => val === null || val.length >= 2, {
+    .transform((val) => val.trim() === '' ? null : val.trim()) // Converte string vazia para null
+    .refine((val) => val === null || val.length >= 2, { // Valida comprimento se não for null
       message: "O sobrenome deve ter pelo menos 2 caracteres."
-    }) as z.ZodType<string | null>,
+    }) as z.ZodType<string | null>, // Asserção de tipo para Zod
 });
 
 interface ProfileFormProps {
@@ -53,6 +58,8 @@ const ProfileForm = ({ profile }: ProfileFormProps) => {
   }, [profile, form]);
 
   const onSubmit = async (values: ProfileFormValues) => {
+    // 'values' agora terá 'first_name' e 'last_name' como 'string | null',
+    // correspondendo a UpdateProfilePayload.
     await updateProfileMutation.mutateAsync(values);
   };
 
@@ -66,7 +73,7 @@ const ProfileForm = ({ profile }: ProfileFormProps) => {
             <FormItem>
               <FormLabel>Primeiro Nome</FormLabel>
               <FormControl>
-                <Input placeholder="Seu primeiro nome" {...field} value={field.value || ""} /> {/* Convertendo null para "" */}
+                <Input placeholder="Seu primeiro nome" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -79,7 +86,7 @@ const ProfileForm = ({ profile }: ProfileFormProps) => {
             <FormItem>
               <FormLabel>Sobrenome</FormLabel>
               <FormControl>
-                <Input placeholder="Seu sobrenome" {...field} value={field.value || ""} /> {/* Convertendo null para "" */}
+                <Input placeholder="Seu sobrenome" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
