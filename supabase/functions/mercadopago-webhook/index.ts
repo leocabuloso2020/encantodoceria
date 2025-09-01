@@ -1,6 +1,6 @@
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts"; // Atualizado para 0.224.0
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
-import { createHmac } from "https://deno.land/std@0.224.0/node/crypto.ts"; // Atualizado para 0.224.0
+// Removido: import { createHmac } from "https://deno.land/std@0.224.0/node/crypto.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -15,7 +15,6 @@ serve(async (req) => {
   }
 
   try {
-    // Log all incoming headers for debugging
     console.log("Incoming headers:");
     for (const [key, value] of req.headers.entries()) {
       console.log(`${key}: ${value}`);
@@ -47,9 +46,25 @@ serve(async (req) => {
     const rawBody = await req.text(); // Ler o corpo da requisição como texto
     const message = `id:${xWebhookId};uri:/v1/payments;ts:${xTimestamp};data:${rawBody}`;
 
-    const hmac = createHmac('sha256', webhookSecret);
-    hmac.update(message);
-    const expectedSignature = hmac.digest('hex');
+    // Usando Web Crypto API para calcular HMAC
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(webhookSecret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"]
+    );
+
+    const signature = await crypto.subtle.sign(
+      "HMAC",
+      key,
+      encoder.encode(message)
+    );
+
+    const expectedSignature = Array.from(new Uint8Array(signature))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
 
     if (expectedSignature !== xSignature) {
       console.error("Mercado Pago signature verification failed.");
