@@ -8,7 +8,7 @@ import CustomerDetailsDialog from "./CustomerDetailsDialog";
 import { useCreateOrder } from "@/hooks/use-create-order";
 import { useSession } from "@/components/SessionContextProvider";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom"; // Importar useNavigate
+import { useNavigate } from "react-router-dom";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -20,12 +20,10 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
   const [isCustomerDetailsDialogOpen, setIsCustomerDetailsDialogOpen] = useState(false);
   const createOrderMutation = useCreateOrder();
   const { user, loading: sessionLoading } = useSession();
-  const navigate = useNavigate(); // Inicializar useNavigate
+  const navigate = useNavigate();
 
   const handleInitiateCheckout = () => {
     if (!user) {
-      // Esta condição não deve ser alcançada se o botão "Faça login" for clicado
-      // e o usuário for redirecionado. Mas é um fallback.
       toast.error("Você precisa estar logado para finalizar o pedido.", {
         description: "Por favor, faça login ou cadastre-se.",
       });
@@ -74,7 +72,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
         description: `Valor: R$ ${amount} - Chave PIX: ${pixKey}`,
       });
       
-      clearCart(); // Limpa o carrinho após o pedido
+      clearCart();
       setIsCustomerDetailsDialogOpen(false);
       onClose();
     } catch (error) {
@@ -83,8 +81,8 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
   };
 
   const handleLoginClick = () => {
-    onClose(); // Fecha o drawer do carrinho
-    navigate('/login'); // Redireciona para a página de login
+    onClose();
+    navigate('/login');
   };
 
   return (
@@ -145,18 +143,17 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
           </div>
           <SheetFooter className="flex flex-col gap-4 mt-6">
             <div className="flex justify-between items-center text-lg font-semibold text-foreground">
-              <span>Total:</span>
-              <span>R$ {totalPrice.toFixed(2)}</span>
+              <span className="text-base text-muted-foreground">Total:</span>
+              <span className="text-xl font-bold text-primary">R$ {totalPrice.toFixed(2)}</span>
             </div>
 
-            {/* Lógica condicional para o botão de checkout/login */}
             {!user ? (
               <Button
                 onClick={handleLoginClick}
-                className="w-full pix-button bg-primary hover:bg-primary-hover text-primary-foreground font-semibold py-3 text-lg rounded-lg shadow-lg hover:shadow-xl"
-                disabled={sessionLoading} // Desabilita enquanto a sessão está carregando
+                className="w-full pix-button bg-primary hover:bg-primary-hover text-primary-foreground font-semibold py-2 text-base rounded-lg shadow-lg hover:shadow-xl"
+                disabled={sessionLoading}
               >
-                <ShoppingBag className="h-5 w-5 mr-2" />
+                <ShoppingBag className="h-4 w-4 mr-2" />
                 {sessionLoading ? 'Carregando...' : 'Faça login'}
               </Button>
             ) : (
@@ -169,13 +166,10 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
                 {createOrderMutation.isPending ? 'Processando...' : 'Finalizar'}
               </Button>
             )}
-            
-            {/* A mensagem da chave PIX foi removida daqui */}
           </SheetFooter>
         </SheetContent>
       </Sheet>
 
-      {/* Customer Details Dialog for Checkout */}
       {isCustomerDetailsDialogOpen && (
         <CustomerDetailsDialog
           isOpen={isCustomerDetailsDialogOpen}
