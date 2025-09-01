@@ -3,13 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ShoppingBag, Trash2, MinusCircle, PlusCircle, XCircle } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { useState } from "react";
 import CustomerDetailsDialog from "./CustomerDetailsDialog";
 import { useCreateOrder } from "@/hooks/use-create-order";
 import { useSession } from "@/components/SessionContextProvider";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom"; // Importar useNavigate
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -21,9 +20,12 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
   const [isCustomerDetailsDialogOpen, setIsCustomerDetailsDialogOpen] = useState(false);
   const createOrderMutation = useCreateOrder();
   const { user, loading: sessionLoading } = useSession();
+  const navigate = useNavigate(); // Inicializar useNavigate
 
   const handleInitiateCheckout = () => {
     if (!user) {
+      // Esta condição não deve ser alcançada se o botão "Faça login" for clicado
+      // e o usuário for redirecionado. Mas é um fallback.
       toast.error("Você precisa estar logado para finalizar o pedido.", {
         description: "Por favor, faça login ou cadastre-se.",
       });
@@ -78,6 +80,11 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
     } catch (error) {
       setIsCustomerDetailsDialogOpen(false);
     }
+  };
+
+  const handleLoginClick = () => {
+    onClose(); // Fecha o drawer do carrinho
+    navigate('/login'); // Redireciona para a página de login
   };
 
   return (
@@ -141,14 +148,28 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
               <span>Total:</span>
               <span>R$ {totalPrice.toFixed(2)}</span>
             </div>
-            <Button
-              onClick={handleInitiateCheckout}
-              className="w-full pix-button bg-primary hover:bg-primary-hover text-primary-foreground font-semibold py-3 text-lg rounded-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={cartItems.length === 0 || createOrderMutation.isPending || sessionLoading || !user}
-            >
-              <ShoppingBag className="h-5 w-5 mr-2" />
-              {sessionLoading ? 'Carregando...' : !user ? 'Faça login' : (createOrderMutation.isPending ? 'Processando...' : 'Finalizar')}
-            </Button>
+
+            {/* Lógica condicional para o botão de checkout/login */}
+            {!user ? (
+              <Button
+                onClick={handleLoginClick}
+                className="w-full pix-button bg-primary hover:bg-primary-hover text-primary-foreground font-semibold py-3 text-lg rounded-lg shadow-lg hover:shadow-xl"
+                disabled={sessionLoading} // Desabilita enquanto a sessão está carregando
+              >
+                <ShoppingBag className="h-5 w-5 mr-2" />
+                {sessionLoading ? 'Carregando...' : 'Faça login'}
+              </Button>
+            ) : (
+              <Button
+                onClick={handleInitiateCheckout}
+                className="w-full pix-button bg-primary hover:bg-primary-hover text-primary-foreground font-semibold py-3 text-lg rounded-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={cartItems.length === 0 || createOrderMutation.isPending || sessionLoading}
+              >
+                <ShoppingBag className="h-5 w-5 mr-2" />
+                {createOrderMutation.isPending ? 'Processando...' : 'Finalizar'}
+              </Button>
+            )}
+            
             <p className="text-xs text-muted-foreground text-center">
               Pagamento seguro via PIX • Chave: 31993305095
             </p>
