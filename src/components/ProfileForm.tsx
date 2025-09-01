@@ -18,18 +18,21 @@ import { Loader2 } from "lucide-react";
 // Define o tipo dos valores do formulário diretamente a partir de UpdateProfilePayload
 type ProfileFormValues = UpdateProfilePayload;
 
-// O esquema usa `z.preprocess` para converter strings vazias em `null` antes da validação.
-// Em seguida, `z.string().min(2).nullable()` garante que o campo seja `string | null`
-// e não opcional, resolvendo o erro de tipagem com `UpdateProfilePayload`.
+// O esquema usa `z.string().transform` com uma asserção de tipo explícita para `string | null`,
+// e `pipe` com `z.union` e `z.null()` para validar e garantir o tipo `string | null` (não opcional).
 const profileSchema: z.ZodType<ProfileFormValues> = z.object({
-  first_name: z.preprocess(
-    (val) => (typeof val === 'string' && val.trim() === '') ? null : val, // Converte string vazia para null
-    z.string().min(2, { message: "O primeiro nome deve ter pelo menos 2 caracteres." }).nullable() // Valida como string ou null (não opcional)
-  ),
-  last_name: z.preprocess(
-    (val) => (typeof val === 'string' && val.trim() === '') ? null : val, // Converte string vazia para null
-    z.string().min(2, { message: "O sobrenome deve ter pelo menos 2 caracteres." }).nullable() // Valida como string ou null (não opcional)
-  ),
+  first_name: z.string()
+    .transform((val): string | null => val.trim() === '' ? null : val.trim()) // Converte string vazia para null, com tipo explícito
+    .pipe(z.union([
+      z.string().min(2, { message: "O primeiro nome deve ter pelo menos 2 caracteres." }),
+      z.null() // Permite explicitamente o valor null
+    ])),
+  last_name: z.string()
+    .transform((val): string | null => val.trim() === '' ? null : val.trim()) // Converte string vazia para null, com tipo explícito
+    .pipe(z.union([
+      z.string().min(2, { message: "O sobrenome deve ter pelo menos 2 caracteres." }),
+      z.null() // Permite explicitamente o valor null
+    ])),
 });
 
 interface ProfileFormProps {
