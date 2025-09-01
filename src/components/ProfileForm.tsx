@@ -15,23 +15,21 @@ import { UserProfile, useUpdateUserProfile, UpdateProfilePayload } from "@/hooks
 import React from "react";
 import { Loader2 } from "lucide-react";
 
-// O esquema usa `z.string().transform` para converter strings vazias em `null`,
-// `refine` para validar o comprimento apenas se o valor não for `null`,
-// e uma asserção de tipo (`as z.ZodType<string | null>`) para garantir a inferência correta.
-const profileSchema = z.object({
+// Define o tipo dos valores do formulário diretamente a partir de UpdateProfilePayload
+type ProfileFormValues = UpdateProfilePayload;
+
+// O esquema usa `z.string().transform` para converter strings vazias em `null`
+// e `pipe` com `z.string().min(2).nullable()` para validar e garantir o tipo `string | null`.
+// A anotação `z.ZodType<ProfileFormValues>` força o Zod a garantir que o esquema
+// produza o tipo esperado, resolvendo a incompatibilidade.
+const profileSchema: z.ZodType<ProfileFormValues> = z.object({
   first_name: z.string()
     .transform(val => val.trim() === '' ? null : val.trim()) // Converte string vazia para null
-    .refine(val => val === null || val.length >= 2, { // Valida comprimento se não for null
-      message: "O primeiro nome deve ter pelo menos 2 caracteres."
-    }) as z.ZodType<string | null>, // Garante que o tipo inferido seja string | null
+    .pipe(z.string().min(2, { message: "O primeiro nome deve ter pelo menos 2 caracteres." }).nullable()), // Valida e permite null
   last_name: z.string()
     .transform(val => val.trim() === '' ? null : val.trim()) // Converte string vazia para null
-    .refine(val => val === null || val.length >= 2, { // Valida comprimento se não for null
-      message: "O sobrenome deve ter pelo menos 2 caracteres."
-    }) as z.ZodType<string | null>, // Garante que o tipo inferido seja string | null
+    .pipe(z.string().min(2, { message: "O sobrenome deve ter pelo menos 2 caracteres." }).nullable()), // Valida e permite null
 });
-
-type ProfileFormValues = z.infer<typeof profileSchema>;
 
 interface ProfileFormProps {
   profile: UserProfile;
