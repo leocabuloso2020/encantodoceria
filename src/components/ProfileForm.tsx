@@ -16,14 +16,12 @@ import React from "react";
 import { Loader2 } from "lucide-react";
 
 const profileSchema = z.object({
-  first_name: z.union([
-    z.string().min(2, { message: "O primeiro nome deve ter pelo menos 2 caracteres." }),
-    z.literal(null)
-  ]).transform(e => e === "" ? null : e), // Transforma string vazia em null
-  last_name: z.union([
-    z.string().min(2, { message: "O sobrenome deve ter pelo menos 2 caracteres." }),
-    z.literal(null)
-  ]).transform(e => e === "" ? null : e), // Transforma string vazia em null
+  first_name: z.string()
+    .transform(e => e === "" ? null : e) // Transforma string vazia em null
+    .pipe(z.string().min(2, { message: "O primeiro nome deve ter pelo menos 2 caracteres." }).nullable()), // Pipe para garantir tipo e validação
+  last_name: z.string()
+    .transform(e => e === "" ? null : e) // Transforma string vazia em null
+    .pipe(z.string().min(2, { message: "O sobrenome deve ter pelo menos 2 caracteres." }).nullable()), // Pipe para garantir tipo e validação
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -38,15 +36,15 @@ const ProfileForm = ({ profile }: ProfileFormProps) => {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      first_name: profile.first_name || null, // Use null como padrão para Zod union
-      last_name: profile.last_name || null,   // Use null como padrão para Zod union
+      first_name: profile.first_name || null,
+      last_name: profile.last_name || null,
     },
   });
 
   React.useEffect(() => {
     form.reset({
-      first_name: profile.first_name || null, // Use null como padrão para Zod union
-      last_name: profile.last_name || null,   // Use null como padrão para Zod union
+      first_name: profile.first_name || null,
+      last_name: profile.last_name || null,
     });
   }, [profile, form]);
 

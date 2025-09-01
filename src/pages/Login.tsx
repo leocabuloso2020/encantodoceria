@@ -67,43 +67,14 @@ const ptLocalization = {
 };
 
 const Login = () => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        // Check if the user is an admin
-        supabase
-          .from('profiles')
-          .select('is_admin')
-          .eq('id', session.user.id)
-          .single()
-          .then(({ data, error }) => {
-            if (error) {
-              console.error('Error fetching profile:', error);
-              toast.error('Erro ao carregar perfil do usuário.');
-              supabase.auth.signOut(); // Sign out if profile cannot be fetched
-              return;
-            }
-            if (data?.is_admin) {
-              navigate('/admin');
-              toast.success('Login de administrador realizado com sucesso!');
-            } else {
-              toast.error('Acesso restrito. Você não tem permissões de administrador.');
-              supabase.auth.signOut(); // Sign out if not admin
-            }
-          });
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+  // Removido o useEffect com onAuthStateChange daqui.
+  // A SessionContextProvider agora é responsável por gerenciar o estado de autenticação e redirecionamentos.
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary-soft p-4">
       <div className="w-full max-w-md bg-card p-8 rounded-lg shadow-lg border border-border/50">
         <h2 className="text-3xl font-bold text-center text-foreground mb-8 font-dancing gradient-text">
-          Doces da Paty - Admin
+          Doces da Paty - Login
         </h2>
         <Auth
           supabaseClient={supabase}
@@ -130,7 +101,7 @@ const Login = () => {
           }}
           theme="light"
           localization={ptLocalization} // Usa o objeto de localização em português definido localmente
-          redirectTo={window.location.origin + '/admin'} // Redirect to admin after successful login
+          redirectTo={window.location.origin + '/'} // Redireciona para a página inicial após o login
         />
       </div>
     </div>
