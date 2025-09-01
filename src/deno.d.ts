@@ -14,19 +14,6 @@ declare module "https://esm.sh/@supabase/supabase-js@2.45.0" {
   export function createClient(supabaseUrl: string, supabaseKey: string): any;
 }
 
-declare module "https://deno.land/x/deno_pix/mod.ts" { // Caminho corrigido para não ter a versão
-  // Minimal declaration for the Pix class
-  export class Pix {
-    constructor();
-    setPixKey(key: string): void;
-    setAmount(amount: number | string): void;
-    setTransactionId(id: string): void;
-    setMerchantName(name: string): void;
-    setMerchantCity(city: string): void;
-    getBrCode(): string;
-  }
-}
-
 declare namespace Deno {
   namespace env {
     function get(key: string): string | undefined;
