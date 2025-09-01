@@ -9,7 +9,7 @@ const Footer = () => {
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
               <Heart className="h-8 w-8 text-primary" fill="currentColor" />
-              <h3 className="font-dancing text-2xl font-bold gradient-text">Encanto Doce</h3>
+              <h3 className="font-dancing text-2xl font-bold gradient-text">Encanto Doceria</h3>
             </div>
             <p className="text-muted-foreground leading-relaxed">
               Criado por Paola Ribeiro com muito amor e ingredientes selecionados. 
@@ -44,7 +44,7 @@ const Footer = () => {
                 className="flex items-center space-x-3 text-muted-foreground hover:text-primary transition-colors duration-300"
               >
                 <Instagram className="h-5 w-5" />
-                <span>@encantodoce</span>
+                <span>@encantodoceria</span>
               </a>
             </div>
           </div>
@@ -68,7 +68,7 @@ const Footer = () => {
 
         <div className="border-t border-border/50 mt-8 pt-8 text-center">
           <p className="text-sm text-muted-foreground">
-            © 2024 Encanto Doce. Feito com{" "}
+            © 2024 Encanto Doceria. Feito com{" "}
             <Heart className="inline h-4 w-4 text-primary mx-1" fill="currentColor" />
             para adoçar seus momentos especiais.
           </p>

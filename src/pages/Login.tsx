@@ -1,7 +1,7 @@
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Corrigido: Removido '=>'
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -30,7 +30,7 @@ const ptLocalization = {
     },
     forgotten_password: {
       email_label: 'Seu e-mail',
-      email_input_placeholder: 'Digite seu e-mail para redefinir a senha',
+      email_input_placeholder: 'Digite seu e-email para redefinir a senha',
       button_label: 'Enviar instruções de redefinição',
       loading_button_label: 'Enviando...',
       link_text: 'Esqueceu sua senha?',
@@ -74,7 +74,7 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary-soft p-4">
       <div className="w-full max-w-md bg-card p-8 rounded-lg shadow-lg border border-border/50">
         <h2 className="text-3xl font-bold text-center text-foreground mb-8 font-dancing gradient-text">
-          Encanto Doce - Login
+          Encanto Doceria - Login
         </h2>
         <Auth
           supabaseClient={supabase}

@@ -20,11 +20,12 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
+    /* Path Aliases */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],
+  "include": ["src", "src/deno.d.ts"], // Incluindo o novo arquivo de declaração de tipos
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -27,7 +27,7 @@ const OrderConfirmation = () => {
   const handleOpenPixApp = () => {
     if (order) {
       const amount = order.total_amount.toFixed(2);
-      const description = `Encanto Doce - Pedido ${order.id.substring(0, 8)}`;
+      const description = `Encanto Doceria - Pedido ${order.id.substring(0, 8)}`;
       const pixUrl = `pix://${pixKey}?amount=${amount}&description=${encodeURIComponent(description)}`;
       window.location.href = pixUrl;
     }

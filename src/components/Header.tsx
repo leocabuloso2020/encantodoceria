@@ -45,7 +45,7 @@ const Header = () => {
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full animate-bounce"></div>
               </div>
               <div>
-                <h1 className="font-dancing text-2xl font-bold gradient-text">Encanto Doce</h1>
+                <h1 className="font-dancing text-2xl font-bold gradient-text">Encanto Doceria</h1>
                 <p className="text-sm text-muted-foreground">Trufas artesanais feitas com amor</p>
               </div>
             </div>
