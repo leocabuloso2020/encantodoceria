@@ -101,7 +101,7 @@ const Login = () => {
           }}
           theme="light"
           localization={ptLocalization} // Usa o objeto de localização em português definido localmente
-          redirectTo={window.location.origin + '/'} // Redireciona para a página inicial após o login
+          // REMOVIDO: redirectTo={window.location.origin + '/'}
         />
       </div>
     </div>
