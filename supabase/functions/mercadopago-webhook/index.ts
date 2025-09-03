@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'; // Corrigido: Adicionado 'from'
 
 console.log("DEBUG: Starting mercadopago-webhook module load."); // Added for debugging
 
@@ -16,6 +16,13 @@ async function verifySignature(
   secret: string
 ): Promise<boolean> {
   console.log("Iniciando verificação de assinatura com Web Crypto API...");
+  
+  // --- NOVOS LOGS DE DEBUG ---
+  console.log("DEBUG: Secret length:", secret.length); 
+  console.log("DEBUG: xSignature header (raw):", xSignature);
+  console.log("DEBUG: xRequestId header:", xRequestId);
+  // --- FIM NOVOS LOGS DE DEBUG ---
+
   const signatureParts = xSignature.split(',');
   let ts = '';
   let v1 = '';
@@ -28,6 +35,12 @@ async function verifySignature(
     }
   }
 
+  // --- NOVOS LOGS DE DEBUG ---
+  console.log("DEBUG: Parsed ts:", ts);
+  console.log("DEBUG: Parsed v1:", v1);
+  console.log("DEBUG: Raw Request Body (for signature):", rawRequestBody);
+  // --- FIM NOVOS LOGS DE DEBUG ---
+
   if (!ts || !v1) {
     console.error("Erro: 'ts' ou 'v1' ausentes no cabeçalho x-signature.");
     return false;
@@ -35,7 +48,7 @@ async function verifySignature(
 
   // CORRIGIDO: Incluindo o corpo da requisição na mensagem a ser assinada
   const message = `id:${xRequestId};ts:${ts};data:${rawRequestBody}`;
-  console.log("Mensagem para assinar:", message);
+  console.log("Mensagem para assinar:", message); // Este log já existia, mas é crucial
 
   const encoder = new TextEncoder();
   const keyData = encoder.encode(secret);
