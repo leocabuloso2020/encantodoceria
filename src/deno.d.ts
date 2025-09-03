@@ -14,13 +14,7 @@ declare module "https://esm.sh/@supabase/supabase-js@2.45.0" {
   export function createClient(supabaseUrl: string, supabaseKey: string): any;
 }
 
-declare module "https://deno.land/std@0.190.0/node/internal/crypto/_wasm/crypto.ts" { // CORRIGIDO: Caminho interno
-  // Minimal declaration for createHmac to satisfy the type checker
-  export function createHmac(algorithm: string, key: string | Uint8Array): {
-    update: (data: string | Uint8Array) => void;
-    digest: (encoding: "hex" | "base64" | "binary") => string;
-  };
-}
+// A declaração para createHmac foi removida, pois agora usamos a Web Crypto API nativa.
 
 declare namespace Deno {
   namespace env {
