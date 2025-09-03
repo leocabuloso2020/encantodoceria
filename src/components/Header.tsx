@@ -37,6 +37,14 @@ const Header = () => {
   };
 
   const handleLogout = async () => {
+    console.log("Attempting logout. Current user:", user); // Log de depuração
+    if (!user) {
+      toast.info('Você já está desconectado.');
+      navigate('/login'); // Garante que o usuário seja redirecionado para a página de login
+      closeMobileMenu();
+      return;
+    }
+
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast.error('Erro ao fazer logout.', { description: error.message });
