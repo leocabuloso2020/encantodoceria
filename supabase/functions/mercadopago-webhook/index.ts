@@ -8,6 +8,26 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+/**
+ * Função auxiliar para ordenar recursivamente as chaves de um objeto JSON.
+ * Isso é crucial para a canonicalização de JSON em verificações de assinatura.
+ */
+function sortObjectKeys(obj: any): any {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(sortObjectKeys);
+  }
+
+  const sortedKeys = Object.keys(obj).sort();
+  const newObj: { [key: string]: any } = {};
+  for (const key of sortedKeys) {
+    newObj[key] = sortObjectKeys(obj[key]);
+  }
+  return newObj;
+}
+
 // Função para verificar a assinatura do webhook do Mercado Pago usando a Web Crypto API
 async function verifySignature(
   rawRequestBody: string,
@@ -42,24 +62,17 @@ async function verifySignature(
     return false;
   }
 
-  // NOVO: Normalizar o corpo da requisição JSON para garantir consistência na assinatura
   let normalizedRequestBody = rawRequestBody;
   try {
     const parsedBody = JSON.parse(rawRequestBody);
-    // Stringify com chaves ordenadas para garantir uma representação canônica
-    // O terceiro argumento de JSON.stringify (null, 2) adicionaria indentação,
-    // mas para assinatura, precisamos de uma string compacta sem espaços extras.
-    // Para ordenar as chaves, precisamos de uma função de replacer mais complexa
-    // ou garantir que o Mercado Pago não se importa com a ordem.
-    // Por enquanto, vamos tentar sem ordenar explicitamente, apenas compactando.
-    normalizedRequestBody = JSON.stringify(parsedBody); 
-    console.log("DEBUG: Normalized Request Body (for signature):", normalizedRequestBody);
+    const sortedBody = sortObjectKeys(parsedBody); // Aplica a ordenação recursiva
+    normalizedRequestBody = JSON.stringify(sortedBody); // Stringifica o corpo ordenado
+    console.log("DEBUG: Normalized & Sorted Request Body (for signature):", normalizedRequestBody);
   } catch (e) {
     console.warn("Aviso: Não foi possível normalizar o corpo da requisição JSON. Usando o corpo original.", e);
-    // Se não for JSON válido, usa o corpo original
   }
 
-  // Usar o corpo normalizado na mensagem a ser assinada
+  // Usar o corpo normalizado e ordenado na mensagem a ser assinada
   const message = `id:${xRequestId};ts:${ts};data:${normalizedRequestBody}`;
   console.log("Mensagem para assinar:", message);
 
