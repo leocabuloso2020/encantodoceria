@@ -47,11 +47,16 @@ const Header = () => {
 
     const { error } = await supabase.auth.signOut();
     if (error) {
+      // Se o erro for 'session_not_found', ainda consideramos um logout bem-sucedido do lado do cliente.
+      // Para outros erros, exibimos o toast de erro.
+      console.error('Erro ao fazer logout no Supabase:', error.message);
       toast.error('Erro ao fazer logout.', { description: error.message });
     } else {
       toast.success('Logout realizado com sucesso!');
-      navigate('/login');
     }
+    // Sempre navega para a página de login após tentar o logout,
+    // independentemente de o servidor ter encontrado uma sessão ativa ou não.
+    navigate('/login');
     closeMobileMenu(); // Fechar menu mobile após logout
   };
 
@@ -90,13 +95,13 @@ const Header = () => {
                 className="cursor-pointer text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium"
               >
                 Como Funciona
-              </a>
+              </a >
               <a 
                 onClick={() => handleScrollToSection('contato')} 
                 className="cursor-pointer text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium"
               >
                 Contato
-              </a>
+              </a >
               {!sessionLoading && user && (
                 <>
                   <Link to="/my-orders" className="text-sm lg:text-base text-foreground hover:text-primary transition-colors duration-300 font-medium flex items-center">
