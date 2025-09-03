@@ -8,6 +8,7 @@ const corsHeaders = {
 
 // Função para verificar a assinatura do webhook do Mercado Pago usando a Web Crypto API
 async function verifySignature(
+  rawRequestBody: string, // Adicionado: corpo da requisição
   xSignature: string,
   xRequestId: string,
   secret: string
@@ -30,7 +31,8 @@ async function verifySignature(
     return false;
   }
 
-  const message = `id:${xRequestId};ts:${ts};`;
+  // CORRIGIDO: Incluindo o corpo da requisição na mensagem a ser assinada
+  const message = `id:${xRequestId};ts:${ts};data:${rawRequestBody}`;
   console.log("Mensagem para assinar:", message);
 
   const encoder = new TextEncoder();
@@ -81,6 +83,7 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // Obter o corpo da requisição como texto para verificação de assinatura
     const rawRequestBody = await req.text();
     const webhookPayload = JSON.parse(rawRequestBody);
 
@@ -97,7 +100,9 @@ serve(async (req) => {
       });
     }
 
+    // CORRIGIDO: Passando o rawRequestBody para a função verifySignature
     const isSignatureValid = await verifySignature(
+      rawRequestBody,
       xSignature,
       xRequestId,
       MERCADO_PAGO_WEBHOOK_SECRET
