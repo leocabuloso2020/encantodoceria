@@ -1,6 +1,6 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts"; // Versão corrigida
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
-import { createHmac } from "https://deno.land/std@0.190.0/node/crypto.ts"; // Versão corrigida
+import { createHmac } from "https://deno.land/std@0.190.0/node/internal/crypto/_wasm/crypto.ts"; // CORRIGIDO: Caminho mais direto para createHmac
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
