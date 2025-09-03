@@ -8,26 +8,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-/**
- * Função auxiliar para ordenar recursivamente as chaves de um objeto JSON.
- * Isso é crucial para a canonicalização de JSON em verificações de assinatura.
- */
-function sortObjectKeys(obj: any): any {
-  if (typeof obj !== 'object' || obj === null) {
-    return obj;
-  }
-  if (Array.isArray(obj)) {
-    return obj.map(sortObjectKeys);
-  }
-
-  const sortedKeys = Object.keys(obj).sort();
-  const newObj: { [key: string]: any } = {};
-  for (const key of sortedKeys) {
-    newObj[key] = sortObjectKeys(obj[key]);
-  }
-  return newObj;
-}
-
 // Função para verificar a assinatura do webhook do Mercado Pago usando a Web Crypto API
 async function verifySignature(
   rawRequestBody: string,
@@ -65,14 +45,13 @@ async function verifySignature(
   let normalizedRequestBody = rawRequestBody;
   try {
     const parsedBody = JSON.parse(rawRequestBody);
-    const sortedBody = sortObjectKeys(parsedBody); // Aplica a ordenação recursiva
-    normalizedRequestBody = JSON.stringify(sortedBody); // Stringifica o corpo ordenado
-    console.log("DEBUG: Normalized & Sorted Request Body (for signature):", normalizedRequestBody);
+    // Stringify para garantir que o JSON esteja compacto e sem formatação
+    normalizedRequestBody = JSON.stringify(parsedBody);
+    console.log("DEBUG: Normalized Request Body (for signature):", normalizedRequestBody);
   } catch (e) {
     console.warn("Aviso: Não foi possível normalizar o corpo da requisição JSON. Usando o corpo original.", e);
   }
 
-  // Usar o corpo normalizado e ordenado na mensagem a ser assinada
   const message = `id:${xRequestId};ts:${ts};data:${normalizedRequestBody}`;
   console.log("Mensagem para assinar:", message);
 
@@ -90,7 +69,6 @@ async function verifySignature(
 
   const signatureBuffer = await crypto.subtle.sign("HMAC", key, messageData);
 
-  // Converte o ArrayBuffer da assinatura para uma string hexadecimal
   const calculatedSignature = Array.from(new Uint8Array(signatureBuffer))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
@@ -124,7 +102,6 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Obter o corpo da requisição como texto para verificação de assinatura
     const rawRequestBody = await req.text();
     const webhookPayload = JSON.parse(rawRequestBody);
 
@@ -141,7 +118,6 @@ serve(async (req) => {
       });
     }
 
-    // Passando o rawRequestBody para a função verifySignature
     const isSignatureValid = await verifySignature(
       rawRequestBody,
       xSignature,
