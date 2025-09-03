@@ -1,13 +1,37 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Package, ShoppingBag, DollarSign, Clock } from 'lucide-react';
+import { Package, ShoppingBag, DollarSign, Clock, Key } from 'lucide-react'; // Adicionado Key
 import { Skeleton } from '@/components/ui/skeleton';
 import { useProducts } from '@/hooks/use-products';
 import { useOrders } from '@/hooks/use-orders';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react'; // Adicionado useState e useEffect
+import { supabase } from '@/integrations/supabase/client'; // Importar supabase
 
 const AdminDashboard = () => {
   const { data: products, isLoading: isLoadingProducts, isError: isErrorProducts, error: errorProducts } = useProducts();
   const { data: orders, isLoading: isLoadingOrders, isError: isErrorOrders, error: errorOrders } = useOrders();
+  const [mercadoPagoSecret, setMercadoPagoSecret] = useState<string | null>(null); // Estado para o segredo
+  const [isLoadingSecret, setIsLoadingSecret] = useState(true); // Estado de carregamento do segredo
+
+  useEffect(() => {
+    const fetchSecret = async () => {
+      setIsLoadingSecret(true);
+      try {
+        const { data, error } = await supabase.functions.invoke('check-secret');
+        if (error) {
+          console.error('Erro ao invocar a função Edge check-secret:', error);
+          setMercadoPagoSecret(`Erro: ${error.message}`);
+        } else {
+          setMercadoPagoSecret(data.secret);
+        }
+      } catch (err: any) {
+        console.error('Erro inesperado ao buscar o segredo:', err);
+        setMercadoPagoSecret(`Erro inesperado: ${err.message}`);
+      } finally {
+        setIsLoadingSecret(false);
+      }
+    };
+    fetchSecret();
+  }, []);
 
   const { totalProducts, pendingOrders, totalRevenue } = useMemo(() => {
     const calculatedTotalProducts = products?.length || 0;
@@ -25,7 +49,7 @@ const AdminDashboard = () => {
     };
   }, [products, orders]);
 
-  if (isLoadingProducts || isLoadingOrders) {
+  if (isLoadingProducts || isLoadingOrders || isLoadingSecret) { // Incluir isLoadingSecret
     return (
       <div className="space-y-6">
         <h2 className="text-3xl font-bold text-foreground">Visão Geral do Dashboard</h2>
@@ -95,6 +119,22 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Card Temporário para Exibir o Segredo do Mercado Pago */}
+      <Card className="bg-gradient-to-br from-card to-secondary-soft border-border/50 shadow-lg">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Mercado Pago Webhook Secret (DEBUG)</CardTitle>
+          <Key className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-sm font-mono break-all text-foreground">
+            {mercadoPagoSecret || "Carregando..."}
+          </div>
+          <p className="text-xs text-destructive mt-2">
+            ⚠️ Este é um valor sensível. Por favor, me peça para remover este card após a verificação.
+          </p>
+        </CardContent>
+      </Card>
 
       <Card className="bg-gradient-to-br from-card to-secondary-soft border-border/50 shadow-lg">
         <CardHeader>
