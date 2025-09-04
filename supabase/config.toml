@@ -1,11 +1,6 @@
 # supabase/config.toml
-
-# Este arquivo define configurações para suas funções Edge.
-# Para a função mercadopago-webhook, desativamos a verificação de JWT
-# para permitir que o Mercado Pago envie webhooks sem autenticação.
+# Este arquivo é usado para configurar as definições de implantação das Supabase Edge Functions.
 
 [[functions]]
 name = "mercadopago-webhook"
-# Define que esta função não requer um token JWT para ser invocada.
-# Isso é essencial para webhooks de terceiros como o Mercado Pago.
-noVerifyJWT = true
+verify_jwt = false # IMPORTANTE: Definido como false para permitir webhooks do Mercado Pago sem JWT
