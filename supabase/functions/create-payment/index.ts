@@ -47,9 +47,7 @@ serve(async (req) => {
       },
       notification_url: `${VERCEL_PROJECT_URL}/api/mercadopago-webhook`,
       external_reference: order.id,
-      payment_methods: {
-        installments: 1, // Força o parcelamento para 1, o que é compatível com PIX
-      },
+      // REMOVIDO: payment_methods para permitir que o Mercado Pago decida os métodos disponíveis
     };
 
     console.log("DEBUG: Mercado Pago Preference object being sent:", JSON.stringify(preference, null, 2)); // Log do objeto de preferência
