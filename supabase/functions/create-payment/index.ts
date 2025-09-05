@@ -47,6 +47,11 @@ serve(async (req) => {
       },
       notification_url: `${VERCEL_PROJECT_URL}/api/mercadopago-webhook`,
       external_reference: order.id,
+      payment_methods: {
+        installments: 1, // Força o parcelamento para 1
+        excluded_payment_methods: [], // Explicitamente não exclui nenhum método
+        excluded_payment_types: [], // Explicitamente não exclui nenhum tipo de pagamento
+      },
     };
 
     console.log("DEBUG: Mercado Pago Preference object being sent:", JSON.stringify(preference, null, 2));
@@ -67,7 +72,7 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log("DEBUG: Mercado Pago API response data:", JSON.stringify(data, null, 2)); // NOVO LOG AQUI
+    console.log("DEBUG: Mercado Pago API response data:", JSON.stringify(data, null, 2));
 
     return new Response(JSON.stringify({ init_point: data.init_point }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
