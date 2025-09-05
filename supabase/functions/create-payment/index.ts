@@ -15,8 +15,7 @@ serve(async (req) => {
   try {
     const { order } = await req.json();
     const accessToken = Deno.env.get('MERCADO_PAGO_ACCESS_TOKEN');
-    // Removido SUPABASE_URL, agora usaremos a URL da Vercel para o webhook
-    const VERCEL_PROJECT_URL = Deno.env.get('VERCEL_PROJECT_URL'); // Nova variável de ambiente
+    const VERCEL_PROJECT_URL = Deno.env.get('VERCEL_PROJECT_URL');
 
     if (!accessToken) {
       throw new Error("Mercado Pago access token is not configured.");
@@ -46,16 +45,9 @@ serve(async (req) => {
         failure: `${req.headers.get('origin')}/order-confirmation/${order.id}`,
         pending: `${req.headers.get('origin')}/order-confirmation/${order.id}`,
       },
-      // AQUI: Apontando para o novo endpoint do webhook na Vercel
       notification_url: `${VERCEL_PROJECT_URL}/api/mercadopago-webhook`,
       external_reference: order.id,
-      payment_methods: {
-        excluded_payment_types: [
-          { id: "ticket" },
-          { id: "credit_card" },
-          { id: "debit_card" }
-        ],
-      },
+      // REMOVIDO: payment_methods.excluded_payment_types para permitir todos os métodos, incluindo PIX
     };
 
     const response = await fetch(MERCADO_PAGO_API_URL, {
