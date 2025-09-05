@@ -15,7 +15,8 @@ serve(async (req) => {
   try {
     const { order } = await req.json();
     const accessToken = Deno.env.get('MERCADO_PAGO_ACCESS_TOKEN');
-    const supabaseProjectUrl = Deno.env.get('SUPABASE_URL');
+    // Removido SUPABASE_URL, agora usaremos a URL da Vercel para o webhook
+    const VERCEL_PROJECT_URL = Deno.env.get('VERCEL_PROJECT_URL'); // Nova variável de ambiente
 
     if (!accessToken) {
       throw new Error("Mercado Pago access token is not configured.");
@@ -23,8 +24,8 @@ serve(async (req) => {
     if (!order) {
       throw new Error("Order details are missing.");
     }
-    if (!supabaseProjectUrl) {
-      throw new Error("Supabase project URL is not configured.");
+    if (!VERCEL_PROJECT_URL) {
+      throw new Error("Vercel project URL is not configured.");
     }
 
     const items = order.items.map((item: any) => ({
@@ -45,7 +46,8 @@ serve(async (req) => {
         failure: `${req.headers.get('origin')}/order-confirmation/${order.id}`,
         pending: `${req.headers.get('origin')}/order-confirmation/${order.id}`,
       },
-      notification_url: `${supabaseProjectUrl}/functions/v1/mercadopago-webhook`,
+      // AQUI: Apontando para o novo endpoint do webhook na Vercel
+      notification_url: `${VERCEL_PROJECT_URL}/api/mercadopago-webhook`,
       external_reference: order.id,
       payment_methods: {
         excluded_payment_types: [
