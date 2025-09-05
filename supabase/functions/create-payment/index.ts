@@ -55,6 +55,12 @@ serve(async (req) => {
     }
     console.log(`DEBUG: Payer name split - First: ${firstName}, Last: ${lastName}`);
 
+    const paymentMethods = {
+      installments: 1, // Força o parcelamento para 1
+      // Removendo 'excluded_payment_methods' e 'excluded_payment_types' completamente
+      // para evitar que o Mercado Pago os interprete como exclusões vazias.
+    };
+
     const preference = {
       items: items,
       payer: {
@@ -77,11 +83,7 @@ serve(async (req) => {
       },
       notification_url: `${VERCEL_PROJECT_URL}/api/mercadopago-webhook`,
       external_reference: order.id,
-      payment_methods: {
-        installments: 1, // Força o parcelamento para 1
-        // REMOVIDO: excluded_payment_methods: [],
-        // REMOVIDO: excluded_payment_types: [],
-      },
+      payment_methods: paymentMethods, // Usando o objeto paymentMethods sem as exclusões
     };
 
     console.log("DEBUG: Mercado Pago Preference object being sent:", JSON.stringify(preference, null, 2));
