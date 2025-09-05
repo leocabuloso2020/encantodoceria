@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { Request, Response } from 'express';
 
 // Adicionado um novo log para forçar o deploy
-console.log("DEBUG: mercadopago-webhook Vercel function - Forcing redeploy (Attempt 5)");
+console.log("DEBUG: mercadopago-webhook Vercel function - Removing debug block (Attempt 6)");
 
 // Função para verificar a assinatura do webhook do Mercado Pago usando a Web Crypto API
 async function verifySignature(
@@ -89,12 +89,105 @@ export default async function handler(req: Request, res: Response) {
     return res.status(204).end();
   }
 
-  // Temporariamente, vamos apenas retornar 200 OK para qualquer POST para depuração
-  if (req.method === 'POST') {
-    console.log("Received POST request. Returning 200 OK for debugging.");
-    return res.status(200).json({ message: 'Webhook received (debugging mode)' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  // Se não for OPTIONS nem POST, retorna 405
-  return res.status(405).json({ error: 'Method Not Allowed' });
+  try {
+    const MERCADO_PAGO_WEBHOOK_SECRET = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
+    const MERCADO_PAGO_ACCESS_TOKEN = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+    const SUPABASE_URL = process.env.SUPABASE_URL;
+    const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+
+    if (!MERCADO_PAGO_WEBHOOK_SECRET || !MERCADO_PAGO_ACCESS_TOKEN || !SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      console.error('Erro: Variáveis de ambiente do Mercado Pago ou Supabase não configuradas.');
+      return res.status(500).json({ error: 'Server configuration error' });
+    }
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const rawRequestBody = JSON.stringify(req.body); // req.body já é o objeto parseado pelo Vercel
+    const webhookPayload = req.body; // Usar req.body diretamente
+
+    console.log("Webhook Payload recebido:", webhookPayload);
+
+    const xSignature = req.headers['x-signature'] as string;
+    const xRequestId = req.headers['x-request-id'] as string;
+
+    if (!xSignature || !xRequestId) {
+      console.error("Erro: Cabeçalhos 'x-signature' ou 'x-request-id' ausentes.");
+      return res.status(400).json({ error: 'Missing required headers' });
+    }
+
+    const isSignatureValid = await verifySignature(
+      rawRequestBody, // Passar o corpo RAW para a verificação
+      xSignature,
+      xRequestId,
+      MERCADO_PAGO_WEBHOOK_SECRET
+    );
+
+    if (!isSignatureValid) {
+      console.error("Erro: Assinatura do webhook inválida.");
+      return res.status(403).json({ error: 'Invalid webhook signature' });
+    }
+    console.log("Assinatura do webhook verificada com sucesso!");
+
+    if (webhookPayload.type === 'payment' && webhookPayload.action === 'payment.updated') {
+      const paymentId = webhookPayload.data.id;
+      console.log("Webhook de pagamento recebido para ID:", paymentId);
+
+      const mpResponse = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+        headers: {
+          'Authorization': `Bearer ${MERCADO_PAGO_ACCESS_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!mpResponse.ok) {
+        const errorBody = await mpResponse.json();
+        console.error("Erro ao consultar API do Mercado Pago:", errorBody);
+        return res.status(500).json({ error: 'Failed to fetch payment details from Mercado Pago', details: errorBody });
+      }
+
+      const paymentDetails = await mpResponse.json();
+      console.log("Detalhes do pagamento do Mercado Pago:", paymentDetails);
+
+      const orderId = paymentDetails.external_reference;
+      const paymentStatus = paymentDetails.status;
+
+      let newOrderStatus: 'pending' | 'paid' | 'preparing' | 'delivered' | 'cancelled';
+      switch (paymentStatus) {
+        case 'approved': newOrderStatus = 'paid'; break;
+        case 'pending': case 'in_process': newOrderStatus = 'pending'; break;
+        case 'rejected': case 'cancelled': case 'refunded': case 'charged_back': newOrderStatus = 'cancelled'; break;
+        default: newOrderStatus = 'pending';
+      }
+
+      console.log(`Atualizando pedido ${orderId} para status: ${newOrderStatus}`);
+
+      const { data: updatedOrder, error: updateError } = await supabase
+        .from('orders')
+        .update({ status: newOrderStatus })
+        .eq('id', orderId)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error('Erro ao atualizar status do pedido no Supabase:', updateError);
+        return res.status(500).json({ error: 'Failed to update order status in Supabase', details: updateError.message });
+      }
+
+      console.log("Pedido atualizado com sucesso no Supabase:", updatedOrder);
+
+      return res.status(200).json({ message: 'Webhook processed successfully', orderStatus: newOrderStatus });
+
+    } else {
+      console.log("Webhook recebido, mas não é um evento de payment.updated. Ignorando.");
+      return res.status(200).json({ message: 'Webhook type not handled' });
+    }
+
+  } catch (error: any) {
+    console.error('Erro geral na função mercadopago-webhook:', error.message);
+    return res.status(500).json({ error: 'Internal Server Error', details: error.message });
+  }
 }
