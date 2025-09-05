@@ -34,11 +34,24 @@ serve(async (req) => {
       currency_id: 'BRL',
     }));
 
+    // Extrair DDD e número do contato do cliente
+    let areaCode = '';
+    let phoneNumber = order.customer_contact;
+    if (order.customer_contact && order.customer_contact.length >= 10) { // Assumindo DDD + 8 ou 9 dígitos
+      areaCode = order.customer_contact.substring(0, 2);
+      phoneNumber = order.customer_contact.substring(2);
+    }
+
     const preference = {
       items: items,
       payer: {
         name: order.customer_name,
         email: `cliente_${Date.now()}@encantodoceria.com`, // E-mail fictício, pois é obrigatório pelo MP
+        phone: { // Adicionando informações de telefone
+          area_code: areaCode,
+          number: phoneNumber,
+        },
+        // Não temos informações de endereço ou identificação no fluxo atual, então omitimos por enquanto.
       },
       back_urls: {
         success: `${req.headers.get('origin')}/order-confirmation/${order.id}`,
