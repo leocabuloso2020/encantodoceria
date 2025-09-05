@@ -53,13 +53,13 @@ serve(async (req) => {
     } else {
       lastName = firstName; // Se houver apenas uma palavra, use-a como sobrenome também
     }
-    console.log(`DEBUG: Payer name split - First: ${firstName}, Last: ${lastName}`); // Novo log para depuração
+    console.log(`DEBUG: Payer name split - First: ${firstName}, Last: ${lastName}`);
 
     const preference = {
       items: items,
       payer: {
         name: firstName,
-        surname: lastName, // Agora o sobrenome será preenchido
+        surname: lastName,
         email: `cliente_${Date.now()}@encantodoceria.com`, // E-mail fictício, pois é obrigatório pelo MP
         phone: { // Adicionando informações de telefone
           area_code: areaCode,
@@ -79,8 +79,8 @@ serve(async (req) => {
       external_reference: order.id,
       payment_methods: {
         installments: 1, // Força o parcelamento para 1
-        excluded_payment_methods: [], // Explicitamente não exclui nenhum método
-        excluded_payment_types: [], // Explicitamente não exclui nenhum tipo de pagamento
+        // REMOVIDO: excluded_payment_methods: [],
+        // REMOVIDO: excluded_payment_types: [],
       },
     };
 
