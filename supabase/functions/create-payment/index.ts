@@ -51,7 +51,10 @@ serve(async (req) => {
           area_code: areaCode,
           number: phoneNumber,
         },
-        // Não temos informações de endereço ou identificação no fluxo atual, então omitimos por enquanto.
+        identification: { // Adicionando informações de CPF
+          type: 'CPF',
+          number: order.customer_cpf,
+        },
       },
       back_urls: {
         success: `${req.headers.get('origin')}/order-confirmation/${order.id}`,

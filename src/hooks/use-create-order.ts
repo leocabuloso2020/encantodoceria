@@ -6,6 +6,7 @@ import { toast } from "sonner";
 interface CreateOrderPayload {
   customer_name: string;
   customer_contact: string;
+  customer_cpf: string; // Adicionado CPF ao payload
   total_amount: number;
   items: OrderItem[]; // Agora é um array de OrderItem
   payment_method: string;

@@ -40,7 +40,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
     setIsCustomerDetailsDialogOpen(true);
   };
 
-  const handleConfirmOrderAndPay = async (customerDetails: { customer_name: string; customer_contact: string }) => {
+  const handleConfirmOrderAndPay = async (customerDetails: { customer_name: string; customer_contact: string; customer_cpf: string }) => {
     if (!user?.id || cartItems.length === 0) return;
 
     setIsProcessingPayment(true);
@@ -58,6 +58,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
     const newOrderPayload = {
       customer_name: customerDetails.customer_name,
       customer_contact: customerDetails.customer_contact,
+      customer_cpf: customerDetails.customer_cpf, // Passando o CPF
       total_amount: totalPrice,
       items: orderItems,
       payment_method: 'Mercado Pago',
