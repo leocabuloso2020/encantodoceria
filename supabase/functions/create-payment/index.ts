@@ -47,8 +47,12 @@ serve(async (req) => {
       },
       notification_url: `${VERCEL_PROJECT_URL}/api/mercadopago-webhook`,
       external_reference: order.id,
-      // REMOVIDO: payment_methods.excluded_payment_types para permitir todos os métodos, incluindo PIX
+      payment_methods: {
+        installments: 1, // Força o parcelamento para 1, o que é compatível com PIX
+      },
     };
+
+    console.log("DEBUG: Mercado Pago Preference object being sent:", JSON.stringify(preference, null, 2)); // Log do objeto de preferência
 
     const response = await fetch(MERCADO_PAGO_API_URL, {
       method: 'POST',
