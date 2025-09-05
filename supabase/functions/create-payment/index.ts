@@ -14,7 +14,7 @@ serve(async (req) => {
 
   try {
     const { order } = await req.json();
-    console.log("DEBUG: Order object received by create-payment:", JSON.stringify(order, null, 2)); // NOVO LOG AQUI
+    console.log("DEBUG: Order object received by create-payment:", JSON.stringify(order, null, 2));
     const accessToken = Deno.env.get('MERCADO_PAGO_ACCESS_TOKEN');
     const VERCEL_PROJECT_URL = Deno.env.get('VERCEL_PROJECT_URL');
 
@@ -43,10 +43,23 @@ serve(async (req) => {
       phoneNumber = order.customer_contact.substring(2);
     }
 
+    // Dividir o nome completo em primeiro nome e sobrenome
+    let firstName = order.customer_name;
+    let lastName = '';
+    const nameParts = order.customer_name.split(' ');
+    if (nameParts.length > 1) {
+      firstName = nameParts[0];
+      lastName = nameParts.slice(1).join(' ');
+    } else {
+      lastName = firstName; // Se houver apenas uma palavra, use-a como sobrenome também
+    }
+    console.log(`DEBUG: Payer name split - First: ${firstName}, Last: ${lastName}`); // Novo log para depuração
+
     const preference = {
       items: items,
       payer: {
-        name: order.customer_name,
+        name: firstName,
+        surname: lastName, // Agora o sobrenome será preenchido
         email: `cliente_${Date.now()}@encantodoceria.com`, // E-mail fictício, pois é obrigatório pelo MP
         phone: { // Adicionando informações de telefone
           area_code: areaCode,
