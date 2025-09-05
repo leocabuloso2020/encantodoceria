@@ -1,6 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import { Request, Response } from 'express';
 
+// Adicionado um novo log para forçar o deploy
+console.log("DEBUG: mercadopago-webhook Vercel function - Forcing redeploy (Attempt 5)");
+
 // Função para verificar a assinatura do webhook do Mercado Pago usando a Web Crypto API
 async function verifySignature(
   rawRequestBody: string,
