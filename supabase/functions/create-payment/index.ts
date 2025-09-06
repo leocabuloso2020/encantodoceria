@@ -18,6 +18,9 @@ serve(async (req) => {
     const accessToken = Deno.env.get('MERCADO_PAGO_ACCESS_TOKEN');
     const VERCEL_PROJECT_URL = Deno.env.get('VERCEL_PROJECT_URL');
 
+    // Adicionando log para o token de acesso (mascarado por segurança)
+    console.log(`DEBUG: Mercado Pago Access Token (first 5 chars): ${accessToken?.substring(0, 5)}`);
+
     if (!accessToken) {
       throw new Error("Mercado Pago access token is not configured.");
     }
@@ -57,8 +60,6 @@ serve(async (req) => {
 
     const paymentMethods = {
       installments: 1, // Força o parcelamento para 1
-      // Removendo 'excluded_payment_methods' e 'excluded_payment_types' completamente
-      // para evitar que o Mercado Pago os interprete como exclusões vazias.
     };
 
     const preference = {
@@ -83,7 +84,7 @@ serve(async (req) => {
       },
       notification_url: `${VERCEL_PROJECT_URL}/api/mercadopago-webhook`,
       external_reference: order.id,
-      payment_methods: paymentMethods, // Usando o objeto paymentMethods sem as exclusões
+      payment_methods: paymentMethods,
     };
 
     console.log("DEBUG: Mercado Pago Preference object being sent:", JSON.stringify(preference, null, 2));
