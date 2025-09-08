@@ -16,18 +16,22 @@ serve(async (req) => {
 
   try {
     const { orderId, totalAmount, customerName, customerContact } = await req.json();
+    console.log("DEBUG: create-efi-pix-charge received request for orderId:", orderId);
 
     const EFI_CLIENT_ID = Deno.env.get('EFI_CLIENT_ID');
     const EFI_CLIENT_SECRET = Deno.env.get('EFI_CLIENT_SECRET');
 
     if (!EFI_CLIENT_ID || !EFI_CLIENT_SECRET) {
+      console.error("ERROR: EFI_CLIENT_ID or EFI_CLIENT_SECRET not configured.");
       throw new Error("EFI_CLIENT_ID or EFI_CLIENT_SECRET not configured.");
     }
     if (!orderId || !totalAmount || !customerName || !customerContact) {
+      console.error("ERROR: Missing required order details for PIX charge.");
       throw new Error("Missing required order details for PIX charge.");
     }
 
     // 1. Obter Token de Acesso da Efi
+    console.log("DEBUG: Attempting to get Efi access token...");
     const credentials = btoa(`${EFI_CLIENT_ID}:${EFI_CLIENT_SECRET}`);
     const authResponse = await fetch(`${EFI_API_BASE_URL}/oauth/token`, {
       method: 'POST',
@@ -42,14 +46,16 @@ serve(async (req) => {
 
     if (!authResponse.ok) {
       const errorBody = await authResponse.json();
-      console.error("Efi Auth API error:", errorBody);
+      console.error("ERROR: Efi Auth API error:", JSON.stringify(errorBody));
       throw new Error(`Failed to get Efi access token: ${errorBody.error_description || authResponse.statusText}`);
     }
 
     const authData = await authResponse.json();
     const accessToken = authData.access_token;
+    console.log("DEBUG: Successfully obtained Efi access token.");
 
     // 2. Criar Cobrança PIX (Cobrança Imediata - 'cob')
+    console.log("DEBUG: Attempting to create PIX charge...");
     const pixChargePayload = {
       calendario: {
         expiracao: 3600 // 1 hora para expirar o PIX
@@ -81,14 +87,16 @@ serve(async (req) => {
 
     if (!pixChargeResponse.ok) {
       const errorBody = await pixChargeResponse.json();
-      console.error("Efi PIX Charge API error:", errorBody);
+      console.error("ERROR: Efi PIX Charge API error:", JSON.stringify(errorBody));
       throw new Error(`Failed to create PIX charge: ${errorBody.detail || pixChargeResponse.statusText}`);
     }
 
     const pixChargeData = await pixChargeResponse.json();
     const locId = pixChargeData.loc.id;
+    console.log("DEBUG: Successfully created PIX charge. locId:", locId);
 
     // 3. Obter QR Code e Payload
+    console.log("DEBUG: Attempting to get QR Code...");
     const qrcodeResponse = await fetch(`${EFI_API_BASE_URL}/v2/loc/${locId}/qrcode`, {
       method: 'GET',
       headers: {
@@ -98,11 +106,12 @@ serve(async (req) => {
 
     if (!qrcodeResponse.ok) {
       const errorBody = await qrcodeResponse.json();
-      console.error("Efi QR Code API error:", errorBody);
+      console.error("ERROR: Efi QR Code API error:", JSON.stringify(errorBody));
       throw new Error(`Failed to get PIX QR Code: ${errorBody.detail || qrcodeResponse.statusText}`);
     }
 
     const qrcodeData = await qrcodeResponse.json();
+    console.log("DEBUG: Successfully obtained QR Code data.");
 
     return new Response(JSON.stringify({
       qrcode_image: qrcodeData.imagemQrcode,
@@ -115,7 +124,7 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Error in create-efi-pix-charge function:', error.message);
+    console.error('FATAL ERROR in create-efi-pix-charge function:', error.message);
     return new Response(JSON.stringify({ error: 'Internal Server Error', details: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
