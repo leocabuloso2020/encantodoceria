@@ -33,6 +33,8 @@ serve(async (req) => {
     // 1. Obter Token de Acesso da Efi
     console.log("DEBUG: Attempting to get Efi access token...");
     const credentials = btoa(`${EFI_CLIENT_ID}:${EFI_CLIENT_SECRET}`);
+    console.log("DEBUG: Base64 Credentials (first 10 chars):", credentials.substring(0, 10) + "..."); // Log parcial para segurança
+    
     const authResponse = await fetch(`${EFI_API_BASE_URL}/oauth/token`, {
       method: 'POST',
       headers: {
