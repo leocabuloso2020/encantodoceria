@@ -14,42 +14,15 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ShoppingBag } from "lucide-react";
 
-// Função para validar CPF
-const isValidCPF = (cpf: string) => {
-  if (typeof cpf !== "string") return false;
-  cpf = cpf.replace(/[^\d]+/g, ""); // Remove non-digits
-  if (cpf.length !== 11 || !!cpf.match(/(\d)\1{10}/)) return false; // Check length and repeated digits
-
-  const cpfNumbers: number[] = cpf.split("").map(Number); // Convert to array of numbers
-
-  // Validate first digit
-  let sum = 0;
-  let remainder;
-  for (let i = 1; i <= 9; i++) {
-    sum = sum + cpfNumbers[i - 1] * (11 - i);
-  }
-  remainder = (sum * 10) % 11;
-  if (remainder === 10 || remainder === 11) remainder = 0;
-  if (remainder !== cpfNumbers[9]) return false;
-
-  sum = 0;
-  for (let i = 1; i <= 10; i++) {
-    sum = sum + cpfNumbers[i - 1] * (12 - i);
-  }
-  remainder = (sum * 10) % 11;
-  if (remainder === 10 || remainder === 11) remainder = 0;
-  if (remainder !== cpfNumbers[10]) return false;
-
-  return true;
-};
+// Função para validar CPF (removida, pois o campo CPF será removido)
 
 const customerDetailsSchema = z.object({
   customer_name: z.string().min(3, { message: "O nome deve ter pelo menos 3 caracteres." }),
   customer_contact: z.string().min(9, { message: "O contato deve ter pelo menos 9 dígitos (ex: 31999998888)." }).max(15, { message: "O contato não deve exceder 15 dígitos." }),
-  customer_cpf: z.string()
-    .min(11, { message: "O CPF deve ter 11 dígitos." })
-    .max(11, { message: "O CPF deve ter 11 dígitos." })
-    .refine(isValidCPF, { message: "CPF inválido." }),
+  // REMOVIDO: customer_cpf: z.string()
+  //   .min(11, { message: "O CPF deve ter 11 dígitos." })
+  //   .max(11, { message: "O CPF deve ter 11 dígitos." })
+  //   .refine(isValidCPF, { message: "CPF inválido." }),
 });
 
 type CustomerDetailsFormValues = z.infer<typeof customerDetailsSchema>;
@@ -68,7 +41,7 @@ const CustomerDetailsDialog = ({ isOpen, onClose, onConfirm, productName, totalA
     defaultValues: {
       customer_name: "",
       customer_contact: "",
-      customer_cpf: "", // Adicionado CPF ao defaultValues
+      // REMOVIDO: customer_cpf: "", // Adicionado CPF ao defaultValues
     },
   });
 
@@ -114,22 +87,10 @@ const CustomerDetailsDialog = ({ isOpen, onClose, onConfirm, productName, totalA
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="customer_cpf"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Seu CPF</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: 12345678900" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* REMOVIDO: Campo CPF */}
             <Button type="submit" className="w-full pix-button" disabled={form.formState.isSubmitting}>
               <ShoppingBag className="h-4 w-4 mr-2" />
-              Confirmar e Pagar via PIX
+              Confirmar Pedido (Pagamento via PIX)
             </Button>
           </form>
         </Form>

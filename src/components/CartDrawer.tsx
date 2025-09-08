@@ -9,7 +9,7 @@ import { useCreateOrder } from "@/hooks/use-create-order";
 import { useSession } from "@/components/SessionContextProvider";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+// REMOVIDO: import { supabase } from "@/integrations/supabase/client";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -19,7 +19,7 @@ interface CartDrawerProps {
 const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
   const { cartItems, removeItem, updateItemQuantity, clearCart, totalItems, totalPrice } = useCart();
   const [isCustomerDetailsDialogOpen, setIsCustomerDetailsDialogOpen] = useState(false);
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [isProcessingOrder, setIsProcessingOrder] = useState(false); // Renomeado para refletir 'processando pedido'
   const createOrderMutation = useCreateOrder();
   const { user, loading: sessionLoading } = useSession();
   const navigate = useNavigate();
@@ -40,10 +40,10 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
     setIsCustomerDetailsDialogOpen(true);
   };
 
-  const handleConfirmOrderAndPay = async (customerDetails: { customer_name: string; customer_contact: string; customer_cpf: string }) => {
+  const handleConfirmOrder = async (customerDetails: { customer_name: string; customer_contact: string }) => {
     if (!user?.id || cartItems.length === 0) return;
 
-    setIsProcessingPayment(true);
+    setIsProcessingOrder(true);
     setIsCustomerDetailsDialogOpen(false);
     const toastId = toast.loading("Criando seu pedido...");
 
@@ -58,36 +58,30 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
     const newOrderPayload = {
       customer_name: customerDetails.customer_name,
       customer_contact: customerDetails.customer_contact,
-      customer_cpf: customerDetails.customer_cpf, // Passando o CPF
       total_amount: totalPrice,
       items: orderItems,
-      payment_method: 'Mercado Pago',
+      payment_method: 'PIX', // Definido como PIX
       user_id: user.id,
     };
 
     try {
       const createdOrder = await createOrderMutation.mutateAsync(newOrderPayload);
-      toast.loading("Redirecionando para o pagamento...", { id: toastId });
-
-      const { data, error } = await supabase.functions.invoke('create-payment', {
-        body: { order: createdOrder },
+      
+      toast.success(`Pedido #${createdOrder.id.substring(0, 8)}... criado com sucesso!`, {
+        id: toastId,
+        description: "Seu pedido foi registrado. Aguardando pagamento via PIX.",
       });
-
-      if (error) throw new Error(`Erro ao criar link de pagamento: ${error.message}`);
-
-      if (data.init_point) {
-        clearCart();
-        onClose();
-        window.location.href = data.init_point;
-      } else {
-        throw new Error("Link de pagamento não recebido.");
-      }
+      
+      clearCart();
+      onClose();
+      navigate(`/order-confirmation/${createdOrder.id}`); // Redireciona para a página de confirmação
     } catch (error: any) {
       toast.error("Ocorreu um erro.", {
         id: toastId,
-        description: error.message || "Não foi possível iniciar o pagamento. Tente novamente.",
+        description: error.message || "Não foi possível finalizar o pedido. Tente novamente.",
       });
-      setIsProcessingPayment(false);
+    } finally {
+      setIsProcessingOrder(false);
     }
   };
 
@@ -171,14 +165,14 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
               <Button
                 onClick={handleInitiateCheckout}
                 className="w-full pix-button bg-primary hover:bg-primary-hover text-primary-foreground font-semibold py-3 text-lg rounded-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={cartItems.length === 0 || isProcessingPayment || sessionLoading}
+                disabled={cartItems.length === 0 || isProcessingOrder || sessionLoading}
               >
-                {isProcessingPayment ? (
+                {isProcessingOrder ? (
                   <Loader2 className="h-5 w-5 mr-2 animate-spin" />
                 ) : (
                   <ShoppingBag className="h-5 w-5 mr-2" />
                 )}
-                {isProcessingPayment ? 'Processando...' : 'Finalizar Compra'}
+                {isProcessingOrder ? 'Processando...' : 'Finalizar Compra'}
               </Button>
             )}
           </SheetFooter>
@@ -189,7 +183,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
         <CustomerDetailsDialog
           isOpen={isCustomerDetailsDialogOpen}
           onClose={() => setIsCustomerDetailsDialogOpen(false)}
-          onConfirm={handleConfirmOrderAndPay}
+          onConfirm={handleConfirmOrder}
           productName="itens do carrinho"
           totalAmount={totalPrice}
         />

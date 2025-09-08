@@ -11,7 +11,6 @@ export interface Order {
   created_at: string;
   customer_name: string;
   customer_contact: string;
-  customer_cpf?: string; // Adicionado: CPF do cliente (opcional inicialmente)
   total_amount: number;
   status: 'pending' | 'paid' | 'preparing' | 'delivered' | 'cancelled';
   items: OrderItem[];
