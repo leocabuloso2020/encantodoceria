@@ -7,8 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { QrCode, Copy, Clock, CheckCircle, AlertCircle, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
-import { QRCode } from 'qrcode.react'; // Corrigido: Importação nomeada para QRCode
+import * as QRCodeModule from 'qrcode.react'; // Corrigido: Importação wildcard
 import { PixDetails } from '@/hooks/use-create-order'; // Importar o tipo PixDetails
+
+// Acessar o componente QRCode através da propriedade 'default' do módulo importado,
+// ou usar o próprio módulo se 'default' não existir (para compatibilidade).
+const QRCode = (QRCodeModule as any).default || QRCodeModule;
 
 const PixPayment = () => {
   const { orderId } = useParams<{ orderId: string }>();
