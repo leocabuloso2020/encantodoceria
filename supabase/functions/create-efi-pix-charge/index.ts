@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// URL da API da Efi (Gerencianet) - Corrigido para o endereço correto
+// URL da API da Efi (Gerencianet)
 const EFI_API_BASE_URL = "https://api.efipay.com.br";
 
 serve(async (req) => {
@@ -36,16 +36,16 @@ serve(async (req) => {
     const authResponse = await fetch(`${EFI_API_BASE_URL}/oauth/token`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded', // CORRIGIDO: Content-Type
         'Authorization': `Basic ${credentials}`,
       },
-      body: JSON.stringify({
+      body: new URLSearchParams({ // CORRIGIDO: Corpo da requisição como URL-encoded
         grant_type: 'client_credentials',
-      }),
+      }).toString(),
     });
 
     if (!authResponse.ok) {
-      const errorBody = await authResponse.json();
+      const errorBody = await authResponse.json(); // Tenta ler como JSON, mas pode falhar se for HTML
       console.error("ERROR: Efi Auth API error:", JSON.stringify(errorBody));
       throw new Error(`Failed to get Efi access token: ${errorBody.error_description || authResponse.statusText}`);
     }
