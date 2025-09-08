@@ -6,8 +6,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// URL da API da Efi (Gerencianet) - Usando a URL de produção conforme o link fornecido
-const EFI_API_BASE_URL = "https://api.sejaefi.com.br";
+// URL da API da Efi (Gerencianet) - Corrigido para o endereço correto
+const EFI_API_BASE_URL = "https://api.efipay.com.br";
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
