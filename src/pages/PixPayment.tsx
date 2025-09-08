@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { QrCode, Copy, Clock, CheckCircle, AlertCircle, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
-import { QRCode } from 'qrcode.react'; // Corrigido: Importação nomeada para QRCode
+import * as QRCodeModule from 'qrcode.react'; // Importação de namespace
 import { PixDetails } from '@/hooks/use-create-order'; // Importar o tipo PixDetails
 
 const PixPayment = () => {
@@ -123,7 +123,7 @@ const PixPayment = () => {
               ) : (
                 <>
                   <div className="p-4 bg-white rounded-lg shadow-md border border-border/50">
-                    <QRCode value={pixDetails.qrcode_payload} size={256} level="H" />
+                    <QRCodeModule.default value={pixDetails.qrcode_payload} size={256} level="H" />
                   </div>
                   <div className="flex items-center space-x-2 text-lg font-semibold text-foreground">
                     <Clock className="h-5 w-5 text-primary" />
