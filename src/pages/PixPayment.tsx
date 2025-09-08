@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { QrCode, Copy, Clock, CheckCircle, AlertCircle, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
-import QRCode from 'qrcode.react'; // Corrigido: Importação padrão para QRCode
+import { QRCode } from 'qrcode.react'; // Corrigido: Importação nomeada para QRCode
 import { PixDetails } from '@/hooks/use-create-order'; // Importar o tipo PixDetails
 
 const PixPayment = () => {
