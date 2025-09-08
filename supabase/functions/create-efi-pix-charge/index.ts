@@ -7,7 +7,8 @@ const corsHeaders = {
 };
 
 // URL da API da Efi (Gerencianet)
-const EFI_API_BASE_URL = "https://api.efipay.com.br";
+// ALTERADO: De produção para ambiente de sandbox/homologação
+const EFI_API_BASE_URL = "https://sandbox.efipay.com.br"; 
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
