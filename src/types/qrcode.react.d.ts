@@ -1,0 +1,26 @@
+import * as React from 'react';
+
+declare module 'qrcode.react' {
+  interface QRCodeProps {
+    value: string;
+    size?: number;
+    level?: 'L' | 'M' | 'Q' | 'H';
+    bgColor?: string;
+    fgColor?: string;
+    includeMargin?: boolean;
+    imageSettings?: {
+      src: string;
+      x?: number;
+      y?: number;
+      height: number;
+      width: number;
+      excavate?: boolean;
+    };
+    renderAs?: 'canvas' | 'svg';
+    className?: string;
+    style?: React.CSSProperties;
+  }
+
+  const QRCode: React.ComponentType<QRCodeProps>;
+  export default QRCode;
+}
