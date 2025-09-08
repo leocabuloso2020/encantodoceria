@@ -6,8 +6,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// URL da API da Efi (Gerencianet)
-const EFI_API_BASE_URL = "https://api-pix.gerencianet.com.br"; 
+// URL da API da Efi (Gerencianet) - CORRIGIDA conforme orientação do suporte
+const EFI_API_BASE_URL = "https://pix.api.efipay.com.br"; 
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
