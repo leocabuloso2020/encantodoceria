@@ -19,4 +19,7 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    exclude: ['qrcode.react'], // Excluir qrcode.react da otimização de dependências
+  },
 }));
