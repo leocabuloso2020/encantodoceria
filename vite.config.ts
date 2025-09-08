@@ -20,6 +20,8 @@ export default defineConfig(({ mode }) => ({
     },
   },
   optimizeDeps: {
-    exclude: ['qrcode.react'], // Excluir qrcode.react da otimização de dependências
+    // REMOVIDO: Exclusão de 'qrcode.react' da otimização de dependências
+    // Vamos permitir que o Vite tente pré-empacotá-lo novamente.
+    exclude: [], 
   },
 }));
