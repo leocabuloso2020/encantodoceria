@@ -7,7 +7,6 @@ const corsHeaders = {
 };
 
 // URL da API da Efi (Gerencianet)
-// CORRIGIDO: Para o endpoint específico da API PIX de produção, conforme a documentação
 const EFI_API_BASE_URL = "https://api-pix.gerencianet.com.br"; 
 
 serve(async (req) => {
@@ -39,15 +38,18 @@ serve(async (req) => {
     const authUrl = `${EFI_API_BASE_URL}/oauth/token`;
     console.log("DEBUG: Efi Auth URL:", authUrl); // Log da URL completa de autenticação
 
+    const authBody = new URLSearchParams({
+      grant_type: 'client_credentials',
+    }).toString();
+    console.log("DEBUG: Efi Auth Request Body:", authBody); // Log do corpo da requisição de autenticação
+
     const authResponse = await fetch(authUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Authorization': `Basic ${credentials}`,
       },
-      body: new URLSearchParams({
-        grant_type: 'client_credentials',
-      }).toString(),
+      body: authBody,
     });
 
     console.log(`DEBUG: Efi Auth Response Status: ${authResponse.status} ${authResponse.statusText}`);
@@ -89,6 +91,8 @@ serve(async (req) => {
         { nome: "ID do Pedido", valor: orderId }
       ]
     };
+
+    console.log("DEBUG: PIX Charge Payload:", JSON.stringify(pixChargePayload)); // Log do payload completo
 
     const pixChargeResponse = await fetch(`${EFI_API_BASE_URL}/v2/cob`, {
       method: 'POST',
