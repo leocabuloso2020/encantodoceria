@@ -36,21 +36,33 @@ serve(async (req) => {
     const authResponse = await fetch(`${EFI_API_BASE_URL}/oauth/token`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded', // CORRIGIDO: Content-Type
+        'Content-Type': 'application/x-www-form-urlencoded',
         'Authorization': `Basic ${credentials}`,
       },
-      body: new URLSearchParams({ // CORRIGIDO: Corpo da requisição como URL-encoded
+      body: new URLSearchParams({
         grant_type: 'client_credentials',
       }).toString(),
     });
 
+    console.log(`DEBUG: Efi Auth Response Status: ${authResponse.status} ${authResponse.statusText}`);
+
+    // Sempre leia o corpo da resposta como texto para depuração, antes de tentar JSON
+    const authResponseText = await authResponse.text();
+    console.log("DEBUG: Efi Auth Raw Response Text (first 500 chars):", authResponseText.substring(0, 500));
+
     if (!authResponse.ok) {
-      const errorBody = await authResponse.json(); // Tenta ler como JSON, mas pode falhar se for HTML
-      console.error("ERROR: Efi Auth API error:", JSON.stringify(errorBody));
-      throw new Error(`Failed to get Efi access token: ${errorBody.error_description || authResponse.statusText}`);
+      // Se a resposta não for OK (ex: 400, 401, 500), lançamos um erro com o texto da resposta
+      throw new Error(`Failed to get Efi access token: ${authResponse.statusText}. Details: ${authResponseText.substring(0, 200)}`);
     }
 
-    const authData = await authResponse.json();
+    let authData;
+    try {
+      authData = JSON.parse(authResponseText);
+    } catch (jsonError) {
+      console.error("ERROR: Failed to parse Efi Auth response as JSON:", jsonError);
+      throw new Error(`Failed to parse Efi Auth response as JSON. Response was: ${authResponseText.substring(0, 200)}`);
+    }
+    
     const accessToken = authData.access_token;
     console.log("DEBUG: Successfully obtained Efi access token.");
 
