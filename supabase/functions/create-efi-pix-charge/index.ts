@@ -7,8 +7,8 @@ const corsHeaders = {
 };
 
 // URL da API da Efi (Gerencianet)
-// ALTERADO: De produção para ambiente de sandbox/homologação
-const EFI_API_BASE_URL = "https://sandbox.efipay.com.br"; 
+// CORRIGIDO: De volta para o ambiente de produção, conforme as credenciais do usuário
+const EFI_API_BASE_URL = "https://api.efipay.com.br"; 
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -34,7 +34,7 @@ serve(async (req) => {
     // 1. Obter Token de Acesso da Efi
     console.log("DEBUG: Attempting to get Efi access token...");
     const credentials = btoa(`${EFI_CLIENT_ID}:${EFI_CLIENT_SECRET}`);
-    console.log("DEBUG: Base64 Credentials (first 10 chars):", credentials.substring(0, 10) + "..."); // Log parcial para segurança
+    console.log("DEBUG: Base64 Credentials (first 10 chars):", credentials.substring(0, 10) + "..."); 
     
     const authResponse = await fetch(`${EFI_API_BASE_URL}/oauth/token`, {
       method: 'POST',
@@ -49,12 +49,10 @@ serve(async (req) => {
 
     console.log(`DEBUG: Efi Auth Response Status: ${authResponse.status} ${authResponse.statusText}`);
 
-    // Sempre leia o corpo da resposta como texto para depuração, antes de tentar JSON
     const authResponseText = await authResponse.text();
     console.log("DEBUG: Efi Auth Raw Response Text (first 500 chars):", authResponseText.substring(0, 500));
 
     if (!authResponse.ok) {
-      // Se a resposta não for OK (ex: 400, 401, 500), lançamos um erro com o texto da resposta
       throw new Error(`Failed to get Efi access token: ${authResponse.statusText}. Details: ${authResponseText.substring(0, 200)}`);
     }
 
@@ -77,11 +75,9 @@ serve(async (req) => {
       },
       devedor: {
         nome: customerName,
-        // O CPF/CNPJ é opcional para cobranças imediatas, mas pode ser adicionado se necessário
-        // cpf: "12345678900" // Exemplo, se você coletar CPF
       },
       valor: {
-        original: totalAmount.toFixed(2) // Formata para 2 casas decimais
+        original: totalAmount.toFixed(2)
       },
       chave: "31993305095", // Sua chave PIX cadastrada na Efi
       solicitacaoPagador: `Pedido #${orderId.substring(0, 8)} - Encanto Doceria`,
@@ -131,7 +127,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({
       qrcode_image: qrcodeData.imagemQrcode,
       qrcode_payload: qrcodeData.qrcode,
-      expiration_date: pixChargeData.calendario.expiracao, // Retorna a expiração em segundos
+      expiration_date: pixChargeData.calendario.expiracao,
       txid: pixChargeData.txid,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
