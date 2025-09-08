@@ -7,8 +7,8 @@ const corsHeaders = {
 };
 
 // URL da API da Efi (Gerencianet)
-// CORRIGIDO: De volta para o ambiente de produção, conforme as credenciais do usuário
-const EFI_API_BASE_URL = "https://api.efipay.com.br"; 
+// ALTERADO: De produção para o domínio 'dev', conforme indicação nos logs de resposta HTML
+const EFI_API_BASE_URL = "https://dev.efipay.com.br"; 
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -34,9 +34,12 @@ serve(async (req) => {
     // 1. Obter Token de Acesso da Efi
     console.log("DEBUG: Attempting to get Efi access token...");
     const credentials = btoa(`${EFI_CLIENT_ID}:${EFI_CLIENT_SECRET}`);
-    console.log("DEBUG: Base64 Credentials (first 10 chars):", credentials.substring(0, 10) + "..."); 
+    console.log("DEBUG: Base64 Credentials (first 10 chars):", credentials.substring(0, 10) + "..."); // Log parcial para segurança
     
-    const authResponse = await fetch(`${EFI_API_BASE_URL}/oauth/token`, {
+    const authUrl = `${EFI_API_BASE_URL}/oauth/token`;
+    console.log("DEBUG: Efi Auth URL:", authUrl); // Log da URL completa de autenticação
+
+    const authResponse = await fetch(authUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
