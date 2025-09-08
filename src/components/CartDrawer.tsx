@@ -9,7 +9,6 @@ import { useCreateOrder } from "@/hooks/use-create-order";
 import { useSession } from "@/components/SessionContextProvider";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-// REMOVIDO: import { supabase } from "@/integrations/supabase/client";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -19,7 +18,7 @@ interface CartDrawerProps {
 const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
   const { cartItems, removeItem, updateItemQuantity, clearCart, totalItems, totalPrice } = useCart();
   const [isCustomerDetailsDialogOpen, setIsCustomerDetailsDialogOpen] = useState(false);
-  const [isProcessingOrder, setIsProcessingOrder] = useState(false); // Renomeado para refletir 'processando pedido'
+  const [isProcessingOrder, setIsProcessingOrder] = useState(false);
   const createOrderMutation = useCreateOrder();
   const { user, loading: sessionLoading } = useSession();
   const navigate = useNavigate();
@@ -45,7 +44,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
 
     setIsProcessingOrder(true);
     setIsCustomerDetailsDialogOpen(false);
-    const toastId = toast.loading("Criando seu pedido...");
+    const toastId = toast.loading("Criando seu pedido e gerando PIX...");
 
     const orderItems = cartItems.map(item => ({
       product_id: item.id,
@@ -67,14 +66,26 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
     try {
       const createdOrder = await createOrderMutation.mutateAsync(newOrderPayload);
       
-      toast.success(`Pedido #${createdOrder.id.substring(0, 8)}... criado com sucesso!`, {
-        id: toastId,
-        description: "Seu pedido foi registrado. Aguardando pagamento via PIX.",
-      });
+      toast.dismiss(toastId); // Dispensa o toast de carregamento
+
+      if (createdOrder.pixDetails) {
+        toast.success(`Pedido #${createdOrder.id.substring(0, 8)}... criado!`, {
+          description: "PIX gerado com sucesso. Redirecionando para o pagamento.",
+        });
+        clearCart();
+        onClose();
+        navigate(`/pix-payment/${createdOrder.id}`, { state: { pixDetails: createdOrder.pixDetails } });
+      } else {
+        // Caso o PIX não tenha sido gerado por algum motivo na Edge Function
+        toast.error("Erro ao gerar PIX.", {
+          description: "Seu pedido foi criado, mas não foi possível gerar o PIX. Por favor, entre em contato.",
+          id: toastId,
+        });
+        clearCart();
+        onClose();
+        navigate(`/order-confirmation/${createdOrder.id}`); // Redireciona para a confirmação sem PIX
+      }
       
-      clearCart();
-      onClose();
-      navigate(`/order-confirmation/${createdOrder.id}`); // Redireciona para a página de confirmação
     } catch (error: any) {
       toast.error("Ocorreu um erro.", {
         id: toastId,
