@@ -54,23 +54,35 @@ serve(async (req) => {
       grant_type: 'client_credentials',
     }).toString();
 
-    const authResponse = await fetch(authUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${credentials}`,
-      },
-      body: authBody,
-      // Adicionar certificados para mTLS como strings PEM
-      cert: clientCertPem,
-      key: clientKeyPem,
-    });
+    let authResponse;
+    let authResponseText = '';
 
-    const authResponseText = await authResponse.text();
+    try {
+      authResponse = await fetch(authUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': `Basic ${credentials}`,
+        },
+        body: authBody,
+        cert: clientCertPem,
+        key: clientKeyPem,
+      });
 
-    if (!authResponse.ok) {
-      console.error(`ERROR: Failed to get Efi access token: ${authResponse.statusText}. Details: ${authResponseText.substring(0, 500)}`);
-      throw new Error(`Failed to get Efi access token: ${authResponse.statusText}. Details: ${authResponseText.substring(0, 500)}`);
+      console.log(`DEBUG: Efi Auth Response Status: ${authResponse.status} - ${authResponse.statusText}`);
+      authResponseText = await authResponse.text();
+
+      if (!authResponse.ok) {
+        console.error(`ERROR: Failed to get Efi access token: ${authResponse.statusText}. Details: ${authResponseText.substring(0, 500)}`);
+        throw new Error(`Failed to get Efi access token: ${authResponse.statusText}. Details: ${authResponseText.substring(0, 500)}`);
+      }
+
+    } catch (fetchError) {
+      console.error('FATAL ERROR in create-efi-pix-charge function during Efi Auth:', fetchError.message || fetchError);
+      return new Response(JSON.stringify({ error: 'Internal Server Error', details: `Efi Auth failed: ${fetchError.message || fetchError}` }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      });
     }
 
     let authData;
