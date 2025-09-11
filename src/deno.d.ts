@@ -14,8 +14,13 @@ declare module "https://esm.sh/@supabase/supabase-js@2.45.0" {
   export function createClient(supabaseUrl: string, supabaseKey: string): any;
 }
 
-// A declaração para createHmac foi removida, pois agora usamos a Web Crypto API nativa.
+// Adicionando declarações para a Web Crypto API, se necessário para funções Edge
+// Nota: Deno já possui tipos globais para Crypto, mas para garantir compatibilidade
+// com o ambiente de build local, podemos adicionar declarações específicas se houver problemas.
+// Por enquanto, vamos assumir que os tipos globais do Deno são suficientes.
 
+// No entanto, para o uso de certificados mTLS, precisamos de variáveis de ambiente para os certificados.
+// A função Edge irá decodificá-los de Base64.
 declare namespace Deno {
   namespace env {
     function get(key: string): string | undefined;

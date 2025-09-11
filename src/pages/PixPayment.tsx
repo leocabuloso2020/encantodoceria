@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { QrCode, Copy, Clock, CheckCircle, AlertCircle, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
-import * as QRCodeModule from 'qrcode.react'; // Corrigido: Importação wildcard
+import * as QRCodeModule from 'qrcode.react'; // Importação wildcard
 import { PixDetails } from '@/hooks/use-create-order'; // Importar o tipo PixDetails
 
 // Acessar o componente QRCode através da propriedade 'default' do módulo importado,
@@ -34,9 +34,7 @@ const PixPayment = () => {
 
     // A Efi retorna a expiração em segundos a partir do momento da criação.
     // Precisamos calcular o tempo restante.
-    // Para simplificar, vamos assumir que `expiration_date` é o tempo total em segundos.
-    // Se `expiration_date` for um timestamp, precisaríamos ajustar.
-    // Por enquanto, vamos usar o valor bruto como segundos restantes.
+    // Para simplificar, vamos usar o valor bruto como segundos restantes.
     setTimeLeft(pixDetails.expiration_date);
 
     const timer = setInterval(() => {

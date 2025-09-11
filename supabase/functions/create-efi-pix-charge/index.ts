@@ -6,7 +6,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// URL da API da Efi (Gerencianet) - CORRIGIDA conforme orientação do suporte
+// Certificado e Chave Privada do Cliente (Base64-encoded)
+// Estes valores serão injetados no ambiente da função Edge
+const CLIENT_CERT_PEM_BASE64 = Deno.env.get('EFI_CLIENT_CERT_PEM_BASE64');
+const CLIENT_KEY_PEM_BASE64 = Deno.env.get('EFI_CLIENT_KEY_PEM_BASE64');
+
+// URL da API da Efi (Gerencianet)
 const EFI_API_BASE_URL = "https://pix.api.efipay.com.br"; 
 
 serve(async (req) => {
@@ -21,27 +26,28 @@ serve(async (req) => {
     const EFI_CLIENT_ID = Deno.env.get('EFI_CLIENT_ID');
     const EFI_CLIENT_SECRET = Deno.env.get('EFI_CLIENT_SECRET');
 
-    if (!EFI_CLIENT_ID || !EFI_CLIENT_SECRET) {
-      console.error("ERROR: EFI_CLIENT_ID or EFI_CLIENT_SECRET not configured.");
-      throw new Error("EFI_CLIENT_ID or EFI_CLIENT_SECRET not configured.");
+    if (!EFI_CLIENT_ID || !EFI_CLIENT_SECRET || !CLIENT_CERT_PEM_BASE64 || !CLIENT_KEY_PEM_BASE64) {
+      console.error("ERROR: EFI credentials or mTLS certificates not configured.");
+      throw new Error("EFI credentials or mTLS certificates not configured.");
     }
     if (!orderId || !totalAmount || !customerName || !customerContact) {
       console.error("ERROR: Missing required order details for PIX charge.");
       throw new Error("Missing required order details for PIX charge.");
     }
 
+    // Decodificar certificados e chave privada
+    const clientCert = new TextDecoder().decode(Uint8Array.from(atob(CLIENT_CERT_PEM_BASE64), c => c.charCodeAt(0)));
+    const clientKey = new TextDecoder().decode(Uint8Array.from(atob(CLIENT_KEY_PEM_BASE64), c => c.charCodeAt(0)));
+
     // 1. Obter Token de Acesso da Efi
     console.log("DEBUG: Attempting to get Efi access token...");
     const credentials = btoa(`${EFI_CLIENT_ID}:${EFI_CLIENT_SECRET}`);
-    console.log("DEBUG: Base64 Credentials (first 10 chars):", credentials.substring(0, 10) + "..."); 
     
     const authUrl = `${EFI_API_BASE_URL}/oauth/token`;
-    console.log("DEBUG: Efi Auth URL:", authUrl); // Log da URL completa de autenticação
 
     const authBody = new URLSearchParams({
       grant_type: 'client_credentials',
     }).toString();
-    console.log("DEBUG: Efi Auth Request Body:", authBody); // Log do corpo da requisição de autenticação
 
     const authResponse = await fetch(authUrl, {
       method: 'POST',
@@ -52,12 +58,10 @@ serve(async (req) => {
       body: authBody,
     });
 
-    console.log(`DEBUG: Efi Auth Response Status: ${authResponse.status} ${authResponse.statusText}`);
-
     const authResponseText = await authResponse.text();
-    console.log("DEBUG: Efi Auth Raw Response Text (first 500 chars):", authResponseText.substring(0, 500));
 
     if (!authResponse.ok) {
+      console.error(`ERROR: Failed to get Efi access token: ${authResponse.statusText}. Details: ${authResponseText.substring(0, 200)}`);
       throw new Error(`Failed to get Efi access token: ${authResponse.statusText}. Details: ${authResponseText.substring(0, 200)}`);
     }
 
@@ -92,14 +96,22 @@ serve(async (req) => {
       ]
     };
 
-    console.log("DEBUG: PIX Charge Payload:", JSON.stringify(pixChargePayload)); // Log do payload completo
-
     const pixChargeResponse = await fetch(`${EFI_API_BASE_URL}/v2/cob`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`,
       },
+      // Adiciona o certificado e a chave privada para mTLS
+      // Nota: O Deno Fetch API suporta 'cert' e 'key' diretamente para mTLS.
+      // No entanto, para Edge Functions, a forma de configurar mTLS pode variar.
+      // Se a Efi exigir mTLS no endpoint /v2/cob, pode ser necessário um cliente HTTP mais robusto
+      // ou uma configuração específica do ambiente Supabase Edge Functions.
+      // Por enquanto, vamos assumir que o mTLS é para o endpoint de autenticação ou que a plataforma
+      // Supabase Edge Functions lida com isso de forma transparente se configurado.
+      // Para o Deno nativo, seria:
+      // cert: clientCert,
+      // key: clientKey,
       body: JSON.stringify(pixChargePayload),
     });
 
