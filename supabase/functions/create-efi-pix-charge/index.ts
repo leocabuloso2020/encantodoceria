@@ -35,9 +35,14 @@ serve(async (req) => {
       throw new Error("Missing required order details for PIX charge.");
     }
 
-    // Decodificar certificados e chave privada para Uint8Array
-    const clientCertUint8 = Uint8Array.from(atob(CLIENT_CERT_PEM_BASE64), c => c.charCodeAt(0));
-    const clientKeyUint8 = Uint8Array.from(atob(CLIENT_KEY_PEM_BASE64), c => c.charCodeAt(0));
+    // Decodificar certificados e chave privada para strings PEM
+    const clientCertPem = new TextDecoder().decode(Uint8Array.from(atob(CLIENT_CERT_PEM_BASE64), c => c.charCodeAt(0)));
+    const clientKeyPem = new TextDecoder().decode(Uint8Array.from(atob(CLIENT_KEY_PEM_BASE64), c => c.charCodeAt(0)));
+
+    console.log(`DEBUG: EFI_CLIENT_ID length: ${EFI_CLIENT_ID.length}`);
+    console.log(`DEBUG: EFI_CLIENT_SECRET length: ${EFI_CLIENT_SECRET.length}`);
+    console.log(`DEBUG: clientCertPem length: ${clientCertPem.length}`);
+    console.log(`DEBUG: clientKeyPem length: ${clientKeyPem.length}`);
 
     // 1. Obter Token de Acesso da Efi
     console.log("DEBUG: Attempting to get Efi access token...");
@@ -45,7 +50,6 @@ serve(async (req) => {
     
     const authUrl = `${EFI_API_BASE_URL}/oauth/token`;
 
-    // Definir authBody antes de usá-lo
     const authBody = new URLSearchParams({
       grant_type: 'client_credentials',
     }).toString();
@@ -57,16 +61,16 @@ serve(async (req) => {
         'Authorization': `Basic ${credentials}`,
       },
       body: authBody,
-      // Adicionar certificados para mTLS
-      cert: clientCertUint8,
-      key: clientKeyUint8,
+      // Adicionar certificados para mTLS como strings PEM
+      cert: clientCertPem,
+      key: clientKeyPem,
     });
 
     const authResponseText = await authResponse.text();
 
     if (!authResponse.ok) {
-      console.error(`ERROR: Failed to get Efi access token: ${authResponse.statusText}. Details: ${authResponseText.substring(0, 200)}`);
-      throw new Error(`Failed to get Efi access token: ${authResponse.statusText}. Details: ${authResponseText.substring(0, 200)}`);
+      console.error(`ERROR: Failed to get Efi access token: ${authResponse.statusText}. Details: ${authResponseText.substring(0, 500)}`);
+      throw new Error(`Failed to get Efi access token: ${authResponse.statusText}. Details: ${authResponseText.substring(0, 500)}`);
     }
 
     let authData;
@@ -74,7 +78,7 @@ serve(async (req) => {
       authData = JSON.parse(authResponseText);
     } catch (jsonError) {
       console.error("ERROR: Failed to parse Efi Auth response as JSON:", jsonError);
-      throw new Error(`Failed to parse Efi Auth response as JSON. Response was: ${authResponseText.substring(0, 200)}`);
+      throw new Error(`Failed to parse Efi Auth response as JSON. Response was: ${authResponseText.substring(0, 500)}`);
     }
     
     const accessToken = authData.access_token;
@@ -106,9 +110,9 @@ serve(async (req) => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`,
       },
-      // Adicionar certificados para mTLS
-      cert: clientCertUint8,
-      key: clientKeyUint8,
+      // Adicionar certificados para mTLS como strings PEM
+      cert: clientCertPem,
+      key: clientKeyPem,
       body: JSON.stringify(pixChargePayload),
     });
 
@@ -129,9 +133,9 @@ serve(async (req) => {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
       },
-      // Adicionar certificados para mTLS
-      cert: clientCertUint8,
-      key: clientKeyUint8,
+      // Adicionar certificados para mTLS como strings PEM
+      cert: clientCertPem,
+      key: clientKeyPem,
     });
 
     if (!qrcodeResponse.ok) {
