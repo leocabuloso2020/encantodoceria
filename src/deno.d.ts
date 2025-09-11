@@ -26,3 +26,10 @@ declare namespace Deno {
     function get(key: string): string | undefined;
   }
 }
+
+// Estender a interface RequestInit para incluir as propriedades 'cert' e 'key'
+// que são suportadas pelo Deno Fetch API para mTLS.
+declare interface RequestInit {
+  cert?: Uint8Array | string;
+  key?: Uint8Array | string;
+}

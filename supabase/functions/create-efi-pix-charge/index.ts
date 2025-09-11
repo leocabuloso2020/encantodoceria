@@ -35,9 +35,9 @@ serve(async (req) => {
       throw new Error("Missing required order details for PIX charge.");
     }
 
-    // Decodificar certificados e chave privada
-    const clientCert = new TextDecoder().decode(Uint8Array.from(atob(CLIENT_CERT_PEM_BASE64), c => c.charCodeAt(0)));
-    const clientKey = new TextDecoder().decode(Uint8Array.from(atob(CLIENT_KEY_PEM_BASE64), c => c.charCodeAt(0)));
+    // Decodificar certificados e chave privada para Uint8Array
+    const clientCertUint8 = Uint8Array.from(atob(CLIENT_CERT_PEM_BASE64), c => c.charCodeAt(0));
+    const clientKeyUint8 = Uint8Array.from(atob(CLIENT_KEY_PEM_BASE64), c => c.charCodeAt(0));
 
     // 1. Obter Token de Acesso da Efi
     console.log("DEBUG: Attempting to get Efi access token...");
@@ -45,6 +45,7 @@ serve(async (req) => {
     
     const authUrl = `${EFI_API_BASE_URL}/oauth/token`;
 
+    // Definir authBody antes de usá-lo
     const authBody = new URLSearchParams({
       grant_type: 'client_credentials',
     }).toString();
@@ -56,6 +57,9 @@ serve(async (req) => {
         'Authorization': `Basic ${credentials}`,
       },
       body: authBody,
+      // Adicionar certificados para mTLS
+      cert: clientCertUint8,
+      key: clientKeyUint8,
     });
 
     const authResponseText = await authResponse.text();
@@ -102,16 +106,9 @@ serve(async (req) => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`,
       },
-      // Adiciona o certificado e a chave privada para mTLS
-      // Nota: O Deno Fetch API suporta 'cert' e 'key' diretamente para mTLS.
-      // No entanto, para Edge Functions, a forma de configurar mTLS pode variar.
-      // Se a Efi exigir mTLS no endpoint /v2/cob, pode ser necessário um cliente HTTP mais robusto
-      // ou uma configuração específica do ambiente Supabase Edge Functions.
-      // Por enquanto, vamos assumir que o mTLS é para o endpoint de autenticação ou que a plataforma
-      // Supabase Edge Functions lida com isso de forma transparente se configurado.
-      // Para o Deno nativo, seria:
-      // cert: clientCert,
-      // key: clientKey,
+      // Adicionar certificados para mTLS
+      cert: clientCertUint8,
+      key: clientKeyUint8,
       body: JSON.stringify(pixChargePayload),
     });
 
@@ -132,6 +129,9 @@ serve(async (req) => {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
       },
+      // Adicionar certificados para mTLS
+      cert: clientCertUint8,
+      key: clientKeyUint8,
     });
 
     if (!qrcodeResponse.ok) {
