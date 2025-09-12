@@ -43,6 +43,10 @@ serve(async (req) => {
     console.log(`DEBUG: EFI_CLIENT_SECRET length: ${EFI_CLIENT_SECRET.length}`);
     console.log(`DEBUG: clientCertPem length: ${clientCertPem.length}`);
     console.log(`DEBUG: clientKeyPem length: ${clientKeyPem.length}`);
+    // Adicionando logs para inspecionar o conteúdo dos certificados
+    console.log(`DEBUG: clientCertPem (start/end): ${clientCertPem.substring(0, 50)}...${clientCertPem.substring(clientCertPem.length - 50)}`);
+    console.log(`DEBUG: clientKeyPem (start/end): ${clientKeyPem.substring(0, 50)}...${clientKeyPem.substring(clientKeyPem.length - 50)}`);
+
 
     // 1. Obter Token de Acesso da Efi
     console.log("DEBUG: Attempting to get Efi access token...");
